@@ -64,7 +64,7 @@ const DataDistribution = ({
 
       // Parse CSV data
       const parsedData = d3.csvParse(csvText);
-      console.log('Parsed data:', parsedData);
+      // console.log('Parsed data:', parsedData);
       setData(parsedData as unknown as DataPoint[]);
     } catch (err) {
       console.error('Error loading data:', err);
