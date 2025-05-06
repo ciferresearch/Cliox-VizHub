@@ -25,6 +25,8 @@ export default function Home() {
       if (dataExists) {
         // Update data status in the store if data exists
         checkDataStatus();
+      } else {
+        setShowUploadModal(true)
       }
       
       setIsLoading(false);
@@ -94,6 +96,7 @@ export default function Home() {
               onClick={() => {
                 localStorage.clear();
                 checkDataStatus();
+                setShowUploadModal(true)
               }}
               className="px-5 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm transition-colors cursor-pointer"
             >
