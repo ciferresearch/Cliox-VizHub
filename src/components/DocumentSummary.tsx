@@ -32,7 +32,7 @@ const DocumentSummary = ({ skipLoading = false }: DocumentSummaryProps) => {
     setError(null);
     try {
       const data = await fetchDocumentSummary();
-      console.log("Document summary data received:", data);
+      // console.log("Document summary data received:", data);
       setSummary(data);
     } catch (error) {
       console.error('Error fetching document summary:', error);
