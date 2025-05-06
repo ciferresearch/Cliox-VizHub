@@ -25,6 +25,9 @@ export default function Home() {
       if (dataExists) {
         // Update data status in the store if data exists
         checkDataStatus();
+      } else {
+        // Auto-open upload modal when no data is present
+        setShowUploadModal(true);
       }
       
       setIsLoading(false);
