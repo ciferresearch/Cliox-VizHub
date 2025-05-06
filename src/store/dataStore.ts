@@ -81,100 +81,6 @@ const parseUserData = (dataType: string): any => {
   }
 };
 
-// Generate mock data for different visualizations
-const generateMockWordCloudData = (): WordCloudData => {
-  const mockWords = [
-    { value: "data", count: 64 },
-    { value: "analysis", count: 43 },
-    { value: "visualization", count: 38 },
-    { value: "chart", count: 30 },
-    { value: "dashboard", count: 29 },
-    { value: "report", count: 27 },
-    { value: "metrics", count: 25 },
-    { value: "insights", count: 23 },
-    { value: "trends", count: 22 },
-    { value: "statistics", count: 21 }
-  ];
-
-  return { wordCloudData: mockWords };
-};
-
-const generateMockDateDistributionCSV = (): string => {
-  const csvRows = ['time,count'];
-
-  // Generate 30 days of random data
-  const today = new Date();
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    const count = Math.floor(Math.random() * 100);
-    csvRows.push(`${dateStr},${count}`);
-  }
-
-  return csvRows.join('\n');
-};
-
-const generateMockEmailDistributionCSV = (): string => {
-  const csvRows = ['emails_per_day'];
-
-  // Add some random data
-  for (let i = 0; i < 30; i++) {
-    csvRows.push(Math.floor(Math.random() * 50).toString());
-  }
-
-  return csvRows.join('\n');
-};
-
-const generateMockSentimentData = (): SentimentData[] => {
-  const sentimentCategories = ['-2', '-1', '0', '+1', '+2'];
-  return sentimentCategories.map(category => {
-    // Generate 30 days of data
-    const values: [string, number][] = [];
-    const today = new Date();
-
-    for (let i = 0; i < 30; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
-      // Random value between 0 and 100
-      const value = Math.floor(Math.random() * 100);
-      values.push([dateStr, value]);
-    }
-
-    return {
-      name: category,
-      values: values
-    };
-  });
-};
-
-const generateMockDocumentSummary = (fileName: string = 'sample.txt'): DocumentSummaryData => {
-  const today = new Date().toISOString().split('T')[0];
-
-  return {
-    totalDocuments: 1,
-    totalWords: 5000,
-    uniqueWords: 1200,
-    vocabularyDensity: 0.24,
-    readabilityIndex: 8.5,
-    wordsPerSentence: 15.3,
-    frequentWords: [
-      { word: "data", count: 64 },
-      { word: "analysis", count: 43 },
-      { word: "visualization", count: 38 },
-      { word: "chart", count: 30 },
-      { word: "dashboard", count: 29 },
-      { word: "report", count: 27 },
-      { word: "metrics", count: 25 },
-      { word: "insights", count: 23 },
-      { word: "trends", count: 22 },
-      { word: "statistics", count: 21 }
-    ],
-    created: `${today} from ${fileName}`
-  };
-};
-
 // Generate document summary from text
 const generateDocumentSummaryFromText = (text: string, fileName: string): DocumentSummaryData => {
   const words = text.split(/\s+/).filter(w => w.length > 0);
@@ -352,103 +258,72 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
   // Data fetching functions for components
   fetchEmailDistribution: async () => {
-    try {
-      if (isDataAvailable(STORAGE_KEYS.EMAIL_DISTRIBUTION)) {
-        const data = localStorage.getItem(STORAGE_KEYS.EMAIL_DISTRIBUTION);
-        if (data) return data;
-      }
-
-      // Generate mock data if no data is available
-      return generateMockEmailDistributionCSV();
-    } catch (error) {
-      console.error('Error fetching email distribution data:', error);
-      return generateMockEmailDistributionCSV();
+    if (isDataAvailable(STORAGE_KEYS.EMAIL_DISTRIBUTION)) {
+      const data = localStorage.getItem(STORAGE_KEYS.EMAIL_DISTRIBUTION);
+      if (data) return data;
     }
+    
+    throw new Error("No email distribution data available. Please upload data first.");
   },
 
   fetchDateDistribution: async () => {
-    try {
-      if (isDataAvailable(STORAGE_KEYS.DATE_DISTRIBUTION)) {
-        const data = localStorage.getItem(STORAGE_KEYS.DATE_DISTRIBUTION);
-        if (data) return data;
-      }
-
-      // Generate mock data if no data is available
-      return generateMockDateDistributionCSV();
-    } catch (error) {
-      console.error('Error fetching date distribution data:', error);
-      return generateMockDateDistributionCSV();
+    if (isDataAvailable(STORAGE_KEYS.DATE_DISTRIBUTION)) {
+      const data = localStorage.getItem(STORAGE_KEYS.DATE_DISTRIBUTION);
+      if (data) return data;
     }
+    
+    throw new Error("No date distribution data available. Please upload data first.");
   },
 
   fetchSentimentData: async () => {
-    try {
-      if (isDataAvailable(STORAGE_KEYS.SENTIMENT)) {
-        const data = localStorage.getItem(STORAGE_KEYS.SENTIMENT);
-        if (data) {
-          try {
-            return JSON.parse(data) as SentimentData[];
-          } catch (e) {
-            console.error('Error parsing sentiment data:', e);
-          }
+    if (isDataAvailable(STORAGE_KEYS.SENTIMENT)) {
+      const data = localStorage.getItem(STORAGE_KEYS.SENTIMENT);
+      if (data) {
+        try {
+          return JSON.parse(data) as SentimentData[];
+        } catch (e) {
+          console.error('Error parsing sentiment data:', e);
+          throw new Error("Invalid sentiment data format. Please upload data again.");
         }
       }
-
-      // Generate mock data if no data is available
-      return generateMockSentimentData();
-    } catch (error) {
-      console.error('Error fetching sentiment data:', error);
-      return generateMockSentimentData();
     }
+    
+    throw new Error("No sentiment data available. Please upload data first.");
   },
 
   fetchWordCloudData: async () => {
-    try {
-      if (isDataAvailable(STORAGE_KEYS.WORD_CLOUD)) {
-        const data = localStorage.getItem(STORAGE_KEYS.WORD_CLOUD);
-        if (data) {
-          try {
-            return JSON.parse(data) as WordCloudData;
-          } catch (e) {
-            console.error('Error parsing word cloud data:', e);
-
-            // If data is text, try to generate word cloud from it
-            return generateWordCloudFromText(data);
-          }
+    if (isDataAvailable(STORAGE_KEYS.WORD_CLOUD)) {
+      const data = localStorage.getItem(STORAGE_KEYS.WORD_CLOUD);
+      if (data) {
+        try {
+          return JSON.parse(data) as WordCloudData;
+        } catch (e) {
+          console.error('Error parsing word cloud data:', e);
+          // If data is text, try to generate word cloud from it
+          return generateWordCloudFromText(data);
         }
       }
-
-      // Generate mock data if no data is available
-      return generateMockWordCloudData();
-    } catch (error) {
-      console.error('Error fetching word cloud data:', error);
-      return generateMockWordCloudData();
     }
+    
+    throw new Error("No word cloud data available. Please upload data first.");
   },
 
   fetchDocumentSummary: async () => {
-    try {
-      if (isDataAvailable(STORAGE_KEYS.DOCUMENT_SUMMARY)) {
-        const data = localStorage.getItem(STORAGE_KEYS.DOCUMENT_SUMMARY);
-        const fileName = localStorage.getItem(`${STORAGE_KEYS.DOCUMENT_SUMMARY}FileName`) || 'user_data.txt';
+    if (isDataAvailable(STORAGE_KEYS.DOCUMENT_SUMMARY)) {
+      const data = localStorage.getItem(STORAGE_KEYS.DOCUMENT_SUMMARY);
+      const fileName = localStorage.getItem(`${STORAGE_KEYS.DOCUMENT_SUMMARY}FileName`) || 'user_data.txt';
 
-        if (data) {
-          try {
-            return JSON.parse(data) as DocumentSummaryData;
-          } catch (e) {
-            console.error('Error parsing document summary data:', e);
-
-            // If data is text, try to generate document summary from it
-            return generateDocumentSummaryFromText(data, fileName);
-          }
+      if (data) {
+        try {
+          return JSON.parse(data) as DocumentSummaryData;
+        } catch (e) {
+          console.error('Error parsing document summary data:', e);
+          // If data is text, try to generate document summary from it
+          return generateDocumentSummaryFromText(data, fileName);
         }
       }
-
-      // Generate mock data if no data is available
-      return generateMockDocumentSummary();
-    } catch (error) {
-      console.error('Error fetching document summary:', error);
-      return generateMockDocumentSummary();
     }
+    
+    throw new Error("No document summary data available. Please upload data first.");
   }
 }));
