@@ -123,7 +123,7 @@ export default function Home() {
               description="Shows the distribution of email counts over time"
               type="email"
               skipLoading={true}
-              disableHover={true}
+              // disableHover={true}
             />
           ) : (
             <EmptyState 
@@ -137,7 +137,7 @@ export default function Home() {
               description="Shows the distribution of emails by date"
               type="date"
               skipLoading={true}
-              disableHover={true}
+              // disableHover={true}
             />
           ) : (
             <EmptyState 
