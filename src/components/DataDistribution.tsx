@@ -12,7 +12,6 @@ interface DataDistributionProps {
   description?: string;
   type: 'email' | 'date';
   skipLoading?: boolean;
-  disableHover?: boolean;
 }
 
 interface DataPoint {
@@ -30,8 +29,7 @@ const DataDistribution = ({
   title,
   description,
   type,
-  skipLoading = false,
-  disableHover = false
+  skipLoading = false
 }: DataDistributionProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<DataPoint[]>([]);
@@ -244,13 +242,12 @@ const DataDistribution = ({
 
     } else if (chartType === 'email') {
       // Emails per day histogram
-      const getEmailValue = (d: any): number => {
+      const getEmailValue = (d: DataPoint): number => {
         if ('emails_per_day' in d) {
-          return +d.emails_per_day;
+          return +(d.emails_per_day ?? 0);
         }
-        // If the key isn't exactly 'emails_per_day', find the first key
         const firstKey = Object.keys(d)[0];
-        return +d[firstKey];
+        return +(d[firstKey as keyof DataPoint] ?? 0);
       };
 
       const values = data.map(getEmailValue).filter(v => !isNaN(v));
@@ -347,7 +344,7 @@ const DataDistribution = ({
       console.warn('Could not determine chart type:', { data, type });
       container.innerHTML = '<p class="text-red-500 text-center">Error: Could not determine chart type</p>';
     }
-  }, [data, chartType]);
+  }, [data, chartType, type]);
 
   // Handle opening the modal
   const handleOpenModal = () => {
@@ -402,7 +399,15 @@ const DataDistribution = ({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         title={title}
-        chartData={data}
+        chartData={chartType === 'date' 
+          ? data.map(d => ({
+              time: d.time ? new Date(d.time) : null,
+              count: d.count ?? 0
+            }))
+          : data.map(d => ({
+              emails_per_day: d.emails_per_day ?? 0
+            }))
+        }
         chartType={chartType}
       />
     </div>
