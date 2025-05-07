@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, MutableRefObject, useState, useMemo } from 'react';
+import { useEffect, useRef, useCallback, MutableRefObject, useState } from 'react';
 import * as d3 from 'd3';
 import cloud from 'd3-cloud';
 import debounce from 'lodash/debounce';
@@ -677,18 +677,9 @@ export const useWordCloudVisualization = ({
       const zoomControlsHeight = 120; // Height of the zoom controls
       const padding = 20; // Padding from edges
       
-      // Calculate position to ensure controls are fully visible
-      let yPosition;
-      if (svgHeight < 200) {
-        // For very small heights, position at top
-        yPosition = padding;
-      } else if (svgHeight < zoomControlsHeight + (padding * 2)) {
-        // For heights that can't fit controls with padding at bottom
-        yPosition = (svgHeight - zoomControlsHeight) / 2; // Center vertically
-      } else {
-        // Default position (bottom with padding)
-        yPosition = svgHeight - zoomControlsHeight - padding;
-      }
+      // Move the controls upward from the bottom by adding an extra offset
+      const upwardOffset = 30; // Pixels to move the controls upward
+      const yPosition = Math.max(padding, svgHeight - zoomControlsHeight - padding - upwardOffset);
       
       svg
         .select(".zoom-controls")
@@ -742,8 +733,8 @@ export const useWordCloudVisualization = ({
     // Update the SVG dimensions
     const svg = d3.select(svgRef.current);
     svg
-      .attr("width", dimensions.width)
-      .attr("height", dimensions.height)
+      .attr("width", "100%") // Use 100% to ensure SVG fills container
+      .attr("height", "100%") // Use 100% to ensure SVG fills container
       .style("width", `${dimensions.width}px`)
       .style("height", `${dimensions.height}px`);
 

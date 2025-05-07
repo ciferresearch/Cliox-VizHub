@@ -22,12 +22,15 @@ const ListEditModal: React.FC<ListEditModalProps> = ({
   // Always declare all hooks at the top, regardless of conditions
   const isStoplist = title.includes("Stopwords") || title.includes("Stoplist");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
 
   // Reset dirty state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setIsDirty(false);
+      setIsSelecting(false);
     }
   }, [isOpen]);
 
@@ -58,9 +61,29 @@ const ListEditModal: React.FC<ListEditModalProps> = ({
     }
   }, [isOpen]);
 
+  // Handle outside click safely - prevent modal closing when selecting text
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if not selecting text and clicking directly on the backdrop
+    if (!isSelecting && e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   // Prevent event propagation to parent elements
   const handleContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  // Track text selection state
+  const handleTextareaMouseDown = () => {
+    setIsSelecting(true);
+  };
+
+  const handleTextareaMouseUp = () => {
+    // Use setTimeout to ensure this happens after any click events
+    setTimeout(() => {
+      setIsSelecting(false);
+    }, 0);
   };
 
   // Update onChange handler to sync textarea content with state
@@ -93,9 +116,10 @@ const ListEditModal: React.FC<ListEditModalProps> = ({
   return (
     <div
       className="fixed inset-0 bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
-      onClick={onClose}
+      onClick={handleBackdropClick}
     >
       <div
+        ref={modalRef}
         className="bg-white rounded-xl shadow-lg max-w-md w-full overflow-hidden"
         onClick={handleContentClick}
       >
@@ -172,6 +196,9 @@ const ListEditModal: React.FC<ListEditModalProps> = ({
               ref={textareaRef}
               value={value}
               onChange={handleTextChange}
+              onMouseDown={handleTextareaMouseDown}
+              onMouseUp={handleTextareaMouseUp}
+              onBlur={() => setIsSelecting(false)}
               placeholder={isStoplist ? "Enter words to exclude..." : "Enter words to include..."}
               className="w-full h-64 border border-gray-300 rounded-md p-3 font-mono text-sm resize-none focus:ring-blue-500 focus:border-blue-500"
               aria-label={isStoplist ? "Stopwords list" : "Whitelist"}
