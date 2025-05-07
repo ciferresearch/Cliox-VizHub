@@ -28,7 +28,6 @@ interface FormattedSeries {
 const decimateData = (data: FormattedDataPoint[], maxPoints: number): FormattedDataPoint[] => {
   if (data.length <= maxPoints) return data;
 
-  const bucketSize = Math.floor(data.length / maxPoints);
   const decimated: FormattedDataPoint[] = [];
 
   decimated.push(data[0]);
@@ -81,8 +80,8 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
 
   const { fetchSentimentData } = useDataStore();
 
-  const parseTime = useCallback(() => d3.timeParse('%Y-%m-%dT%H:%M:%SZ'), []);
-  const formatDate = useCallback(() => d3.timeFormat('%b %d, %Y'), []);
+  const parseTime = useCallback(() => d3.timeParse('%Y-%m-%dT%H:%M:%SZ') as (date: string) => Date | null, []);
+  const formatDate = useCallback(() => d3.timeFormat('%b %d, %Y') as (date: Date) => string, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,7 +131,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
     }
-  }, []);
+  }, [chartRef]);
 
   const renderChart = useCallback(() => {
     if (!chartRef.current || !dateRange) return;
@@ -315,7 +314,12 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         d3.axisBottom(x)
           .ticks(width > 600 ? 6 : 4)
           .tickSize(5)
-          .tickFormat(d3.timeFormat('%Y') as d3.TimeFormat)
+          .tickFormat((d: Date | d3.NumberValue) => {
+            if (d instanceof Date) {
+              return d3.timeFormat('%Y')(d);
+            }
+            return '';
+          })
       )
       .attr('class', 'text-xs')
       .call(g => g.select('.domain').attr('stroke-width', 0.5))
@@ -601,21 +605,12 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
       .on('click', () => {
         setDateRange({ start: fullDateRange[0], end: fullDateRange[1] });
       });
-  }, [brushRef, dateRange, sentimentData]);
+  }, [brushRef, dateRange]);
 
   useEffect(() => {
-    if (!chartRef.current || !sentimentData.length || !dateRange) return;
-
     renderChart();
     renderBrush();
-
-    return () => {
-      if (tooltipRef.current) {
-        tooltipRef.current.remove();
-        tooltipRef.current = null;
-      }
-    };
-  }, [sentimentData, dateRange, chartWidth, parseTime, formatDate, renderChart, renderBrush]);
+  }, [renderChart, renderBrush]);
 
   const getSentimentColor = (sentiment: string): string => {
     switch (sentiment) {
