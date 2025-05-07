@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useWordCloudVisualization } from "./useWordCloudVisualization";
 import OptionsModal from "./modals/OptionsModal";
 import ListEditModal from "./modals/ListEditModal";
@@ -13,10 +13,7 @@ interface WordCloudProps {
   skipLoading?: boolean;
 }
 
-const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
-  // Get SVG ref for d3 visualization
-  const svgRef = useRef<SVGSVGElement>(null);
-  
+const WordCloud: React.FC<WordCloudProps> = ({ skipLoading = false }) => {
   // Get state and actions from store
   const {
     // Data states
@@ -81,7 +78,6 @@ const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
     
     // Option actions
     updateTempOptions,
-    resetOptionsToDefaults,
     setStopwordsEditText,
     setWhitelistEditText,
     
@@ -90,12 +86,14 @@ const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
   } = useWordCloudStore();
 
   // References for controlling the wordcloud visualization
-  const shouldUpdateLayoutRef = useRef(shouldUpdateLayout);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const selectedWordRef = useRef(selectedWord);
   const isPanelVisibleRef = useRef(isPanelVisible);
+  const shouldUpdateLayoutRef = useRef(shouldUpdateLayout);
   const modalsOpenRef = useRef(isOptionsModalOpen || isStopwordsModalOpen || isWhitelistModalOpen);
-  const isWordSelectionActionRef = useRef(isWordSelectionAction);
-  
+  const isWordSelectionActionRef = useRef<boolean>(false);
+
   // Track the last render timestamp to prevent duplicate renders
   const lastRenderTimestampRef = useRef<number>(0);
   const RENDER_DEBOUNCE_MS = 500;
@@ -135,9 +133,7 @@ const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
     modalsOpenRef,
     isWordSelectionActionRef,
     onWordSelect: (word) => {
-      // Let the store handle all state updates
       setSelectedWord(word);
-      
       console.log("Word selected:", word.value);
     },
   });
@@ -320,6 +316,21 @@ const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
       console.log("Filtering to word:", word);
     }, 50);
   };
+
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    const handleWordClick = (event: MouseEvent) => {
+      if (!isWordSelectionAction) {
+        // Handle word click
+      }
+    };
+
+    svgRef.current.addEventListener('click', handleWordClick);
+    return () => {
+      svgRef.current?.removeEventListener('click', handleWordClick);
+    };
+  }, [isWordSelectionAction]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 w-full overflow-hidden">
@@ -541,17 +552,14 @@ const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
       {/* Options Modal */}
       <OptionsModal
         isOpen={isOptionsModalOpen}
-        options={options}
         tempOptions={tempOptions}
         setTempOptions={(newOptions) => {
-          // Update each option individually
           Object.entries(newOptions).forEach(([key, value]) => {
             updateTempOptions(key as keyof typeof options, value);
           });
         }}
         onClose={closeOptionsModal}
         onSave={saveOptions}
-        // Stoplist/Whitelist related props
         selectedLanguage={selectedLanguage}
         stoplistActive={stoplistActive}
         whitelistActive={whitelistActive}
