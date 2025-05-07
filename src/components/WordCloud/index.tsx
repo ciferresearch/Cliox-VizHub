@@ -148,13 +148,14 @@ const WordCloud = ({ skipLoading = false }: WordCloudProps) => {
       const container = svgRef.current?.parentElement;
       if (!container) return;
 
-      // Calculate dimensions based on container size only
-      // Panel state will be handled by CSS flex layout
+      // Calculate dimensions based on container size
       const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight || Math.min(550, window.innerHeight * 0.6);
       
-      // Set new dimensions (with minimum width guarantee)
-      const newWidth = Math.max(containerWidth - 32, 400); // account for padding
-      const newHeight = Math.min(550, window.innerHeight * 0.6);
+      // Set new dimensions to use the full width and height available
+      // Remove the padding subtraction (-32) to ensure the SVG fills the container
+      const newWidth = containerWidth;
+      const newHeight = containerHeight;
 
       // Update dimensions in store
       setDimensions({
