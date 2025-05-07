@@ -3,11 +3,24 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
+// Data types
+type TimeDataPoint = {
+  time: Date | null;
+  count: number;
+};
+
+type EmailDataPoint = {
+  emails_per_day?: number;
+  [key: string]: number | undefined;
+};
+
+type ChartData = TimeDataPoint[] | EmailDataPoint[];
+
 interface ChartModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  chartData: any;
+  chartData: ChartData;
   chartType: 'date' | 'email';
 }
 
@@ -18,9 +31,12 @@ type MarginType = {
   left: number;
 };
 
+// D3 specific types
+type D3ZoomBehavior = d3.ZoomBehavior<SVGSVGElement, unknown>;
+
 const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModalProps) => {
   const modalChartRef = useRef<HTMLDivElement>(null);
-  const zoomRef = useRef<any>(null);
+  const zoomRef = useRef<D3ZoomBehavior | null>(null);
   const marginRef = useRef<MarginType | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
 
@@ -89,25 +105,13 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
 
     if (chartType === 'date') {
       // Date distribution chart
-      const parseTime = d3.timeParse('%Y-%m-%d');
-
-      // Format data
-      const formattedData = chartData.map((d: any) => {
-        const timeKey = 'time' in d ? 'time' : Object.keys(d)[0];
-        const countKey = 'count' in d ? 'count' : Object.keys(d)[1];
-
-        const timeValue = d[timeKey] as string;
-        const countValue = +(d[countKey] as string);
-
-        return {
-          time: parseTime(timeValue),
-          count: countValue
-        };
-      }).filter((d: any) => d.time !== null);
+      const formattedData = (chartData as TimeDataPoint[]).map((d) => ({
+        time: d3.timeParse('%Y-%m-%d')(d.time?.toString() || ''),
+        count: +d.count
+      })).filter((d): d is TimeDataPoint => d.time !== null);
 
       // Set up scales
-      // Safely create domain extents
-      const timeExtent = d3.extent(formattedData, (d: any) => d.time);
+      const timeExtent = d3.extent(formattedData, (d) => d.time);
       const xDomain: [Date, Date] = [
         timeExtent[0] ? new Date(timeExtent[0]) : new Date(),
         timeExtent[1] ? new Date(timeExtent[1]) : new Date()
@@ -117,7 +121,7 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .domain(xDomain)
         .range([0, width]);
 
-      const maxCount = d3.max(formattedData, (d: any) => Number(d.count)) || 10;
+      const maxCount = d3.max(formattedData, (d) => Number(d.count)) || 10;
       const y = d3.scaleLinear()
         .domain([0, maxCount])
         .nice()
@@ -139,7 +143,7 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .call(d3.axisLeft(y));
 
       // Sort data by date for smoother line
-      formattedData.sort((a: any, b: any) => a.time.getTime() - b.time.getTime());
+      formattedData.sort((a, b) => a.time!.getTime() - b.time!.getTime());
 
       // Add area under the line with gradient
       const areaGradient = chartGroup.append('defs')
@@ -159,9 +163,9 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .attr('stop-opacity', 0.05);
 
       // Create area generator
-      const area = d3.area<any>()
+      const area = d3.area<TimeDataPoint>()
         .defined(d => !isNaN(d.count))
-        .x(d => x(d.time))
+        .x(d => x(d.time!))
         .y0(height)
         .y1(d => y(d.count))
         .curve(d3.curveCatmullRom.alpha(0.5)); // Smoother curve
@@ -173,9 +177,9 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .attr('d', area);
 
       // Add line with smoother curve
-      const line = d3.line<any>()
+      const line = d3.line<TimeDataPoint>()
         .defined(d => !isNaN(d.count))
-        .x(d => x(d.time))
+        .x(d => x(d.time!))
         .y(d => y(d.count))
         .curve(d3.curveCatmullRom.alpha(0.5)); // Smoother curve
 
@@ -192,8 +196,8 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .enter()
         .append('circle')
         .attr('class', 'dot')
-        .attr('cx', (d: any) => x(d.time))
-        .attr('cy', (d: any) => y(d.count))
+        .attr('cx', (d) => x(d.time!))
+        .attr('cy', (d) => y(d.count))
         .attr('r', 3) // Smaller points
         .attr('fill', '#F59E0B') // Amber color for points
         .attr('stroke', '#ffffff')
@@ -218,26 +222,22 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .style('transition', 'opacity 0.2s');
 
       // Add hover effects
-      dots.on('mouseover', function(_event: any, d: any) {
+      dots.on('mouseover', function(this: SVGCircleElement, event: MouseEvent, d: TimeDataPoint) {
           d3.select(this)
             .transition()
             .duration(200)
             .attr('r', 6)
             .attr('opacity', 1);
 
-          const date = d.time.toLocaleDateString();
-          // Calculate tooltip position
+          const date = d.time!.toLocaleDateString();
           const svgRect = container.getBoundingClientRect();
           const circleRect = this.getBoundingClientRect();
 
-          // Position tooltip next to the point
           const tooltipX = circleRect.right - svgRect.left + 5;
-          let tooltipY = circleRect.top - svgRect.top - 10;
+          const tooltipY = circleRect.top - svgRect.top - 10;
 
-          // Make sure tooltip is visible within the container
           const tooltipWidth = 150; // Approximate width
           if (tooltipX + tooltipWidth > svgRect.width) {
-            // If tooltip would go outside right edge, position it to the left of the point
             tooltip
               .style('left', (circleRect.left - svgRect.left - tooltipWidth - 5) + 'px')
               .style('top', tooltipY + 'px');
@@ -278,15 +278,15 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
 
     } else if (chartType === 'email') {
       // Emails per day histogram
-      const getEmailValue = (d: any): number => {
+      const getEmailValue = (d: EmailDataPoint): number => {
         if ('emails_per_day' in d) {
-          return +d.emails_per_day;
+          return +d.emails_per_day!;
         }
         const firstKey = Object.keys(d)[0];
-        return +d[firstKey];
+        return +d[firstKey]!;
       };
 
-      const values = chartData.map(getEmailValue).filter((v: number) => !isNaN(v));
+      const values = (chartData as EmailDataPoint[]).map(getEmailValue).filter((v) => !isNaN(v));
 
       if (values.length === 0) {
         console.error('No valid email count values found');
@@ -373,30 +373,25 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
         .attr('opacity', 0.9);
 
       // Add hover effect with tooltip
-      bars.on('mouseover', function(event, d: any) {
-          // Highlight bar
+      bars.on('mouseover', function(this: SVGRectElement, event: MouseEvent, d: d3.Bin<number, number>) {
           d3.select(this)
             .transition()
             .duration(200)
             .attr('opacity', 1);
 
-          // Calculate tooltip position
           const [mouseX, mouseY] = d3.pointer(event, container);
 
-          // Show tooltip with data
           tooltip.html(`Emails: ${d.x0} - ${d.x1}<br>Count: ${d.length}`)
             .style('left', (mouseX + 10) + 'px')
             .style('top', (mouseY - 25) + 'px')
             .style('opacity', 1);
         })
         .on('mouseout', function() {
-          // Restore bar opacity
           d3.select(this)
             .transition()
             .duration(200)
             .attr('opacity', 0.9);
 
-          // Hide tooltip
           tooltip.style('opacity', 0);
         });
 
