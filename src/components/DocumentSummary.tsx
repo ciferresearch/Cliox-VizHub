@@ -49,7 +49,7 @@ const DocumentSummary = ({ skipLoading = false }: DocumentSummaryProps) => {
   
   return (
     <div className="bg-white rounded-lg shadow-md p-4 w-full">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Document Summary</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">Document Summary</h2>
       <div className="w-full bg-gray-50 rounded p-6 overflow-auto">
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center py-8">

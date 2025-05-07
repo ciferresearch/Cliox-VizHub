@@ -720,7 +720,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 w-full">
-      <h2 className="text-xl font-semibold mb-2 text-gray-800 border-b pb-2">Sentiment Analysis by Category</h2>
+      <h2 className="text-xl font-semibold mb-2 text-gray-800 border-b border-gray-200 pb-2">Sentiment Analysis by Category</h2>
 
       {loading && !skipLoading ? (
         <div className="flex items-center justify-center h-[400px]">

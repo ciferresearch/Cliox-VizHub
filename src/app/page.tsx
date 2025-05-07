@@ -177,7 +177,7 @@ export default function Home() {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-4 w-full">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Further more ...</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b border-gray-200 pb-2">Further more ...</h2>
           <p className="text-gray-600">Additional visualizations and analysis tools will be added here.</p>
         </div>
       </main>
