@@ -563,7 +563,7 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
   
   toggleWhitelist: () => {
     // Get current state
-    const { whitelistActive, searchTerm, selectedWord } = get();
+    const { whitelistActive, customWhitelist, searchTerm, selectedWord } = get();
     
     // Close the panel first if it's open
     if (selectedWord) {
@@ -581,30 +581,21 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
     if (newWhitelistActive && customWhitelist.length === 0) {
       // Add default example values
       updatedWhitelist = ["important", "keyword", "significant", "relevant"];
-      
-      // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.WHITELIST, JSON.stringify(updatedWhitelist));
-      }
     }
     
-    // Update state directly without nested setTimeout
-    // This ensures state changes are immediately applied
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS.WHITELIST, JSON.stringify(updatedWhitelist));
+    }
+    
+    // Update state
     set({
       whitelistActive: newWhitelistActive,
-      customWhitelist: updatedWhitelist, // Set the updated whitelist
-      shouldUpdateLayout: true, // Force layout update to ensure rerendering
-      isWordSelectionAction: false, // Ensure this is not treated as a word selection
-      modalsOpen: false, // Ensure modals aren't blocking filter updates
-    });
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.WHITELIST_ACTIVE, newWhitelistActive ? 'true' : 'false');
-    
-    // Always force filteredWords to be recomputed completely
-    // This ensures the visualization updates properly when no words match the whitelist
-    set({
-      filterCacheKey: String(Date.now()) // Invalidate filter cache
+      customWhitelist: updatedWhitelist,
+      shouldUpdateLayout: true,
+      isWordSelectionAction: false,
+      modalsOpen: false,
+      filterCacheKey: String(Date.now())
     });
     
     // Handle search term separately if needed
@@ -612,15 +603,11 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
       // Temporarily clear search term
       set({ searchTerm: '' });
       
-      // Wait a tiny amount of time and reapply search term
-      // This helps ensure the whitelist filter is properly applied first
+      // Reapply search term after a short delay
       setTimeout(() => {
         set({ searchTerm: searchTerm });
         get().filterWords(); // Update filtered words after search term is reapplied
       }, 10);
-    } else {
-      // If no search term, apply filtering immediately
-      get().filterWords();
     }
   },
   
