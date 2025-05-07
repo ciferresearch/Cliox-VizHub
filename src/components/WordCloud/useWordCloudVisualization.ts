@@ -722,7 +722,7 @@ export const useWordCloudVisualization = ({
           );
       }, 50);
     }
-  }, []);
+  }, [svgRef]);
 
   // Update SVG when dimensions change
   useEffect(() => {
@@ -759,7 +759,7 @@ export const useWordCloudVisualization = ({
       shouldUpdateLayoutRef.current = true;
       debouncedUpdate(words);
     }
-  }, [dimensions, words, debouncedUpdate]);
+  }, [dimensions, words, debouncedUpdate, svgRef, modalsOpenRef, shouldUpdateLayoutRef]);
 
   // Monitor panel visibility changes and recenter visualization when needed
   useEffect(() => {
@@ -804,7 +804,7 @@ export const useWordCloudVisualization = ({
     return () => {
       observer.disconnect();
     };
-  }, [isLoading]);
+  }, [isLoading, svgRef, modalsOpenRef]);
 
   return {
     isUpdating,
