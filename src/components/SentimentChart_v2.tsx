@@ -546,7 +546,12 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
       .call(d3.axisBottom(x)
         .ticks(5)
         .tickSize(-height)
-        .tickFormat(d3.timeFormat('%b %Y') as d3.TimeFormat))
+        .tickFormat((d: Date | d3.NumberValue) => {
+          if (d instanceof Date) {
+            return d3.timeFormat('%b %Y')(d);
+          }
+          return '';
+        }))
       .call(g => g.select('.domain').remove())
       .call(g => g.selectAll('.tick line')
         .attr('stroke', '#ccc')

@@ -33,6 +33,7 @@ type MarginType = {
 
 // D3 specific types
 type D3ZoomBehavior = d3.ZoomBehavior<SVGSVGElement, unknown>;
+type D3Selection = d3.Selection<SVGSVGElement, unknown, null, undefined>;
 
 const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModalProps) => {
   const modalChartRef = useRef<HTMLDivElement>(null);
@@ -105,10 +106,7 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
 
     if (chartType === 'date') {
       // Date distribution chart
-      const formattedData = (chartData as TimeDataPoint[]).map((d) => ({
-        time: d3.timeParse('%Y-%m-%d')(d.time?.toString() || ''),
-        count: +d.count
-      })).filter((d): d is TimeDataPoint => d.time !== null);
+      const formattedData = (chartData as TimeDataPoint[]).filter(d => d.time !== null);
 
       // Set up scales
       const timeExtent = d3.extent(formattedData, (d) => d.time);
@@ -417,9 +415,11 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
   // Handle zoom in
   const handleZoomIn = () => {
     if (zoomRef.current && modalChartRef.current) {
-      const baseSvg = d3.select(modalChartRef.current).select('svg');
-      baseSvg.transition().duration(300).call(
-        zoomRef.current.scaleBy, 1.2
+      const baseSvg = d3.select(modalChartRef.current).select('svg') as D3Selection;
+      const currentTransform = d3.zoomTransform(baseSvg.node() as SVGSVGElement);
+      baseSvg.call(
+        zoomRef.current.transform as unknown as (selection: D3Selection, transform: d3.ZoomTransform) => void,
+        currentTransform.scale(currentTransform.k * 1.2)
       );
     }
   };
@@ -427,9 +427,11 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
   // Handle zoom out
   const handleZoomOut = () => {
     if (zoomRef.current && modalChartRef.current) {
-      const baseSvg = d3.select(modalChartRef.current).select('svg');
-      baseSvg.transition().duration(300).call(
-        zoomRef.current.scaleBy, 0.8
+      const baseSvg = d3.select(modalChartRef.current).select('svg') as D3Selection;
+      const currentTransform = d3.zoomTransform(baseSvg.node() as SVGSVGElement);
+      baseSvg.call(
+        zoomRef.current.transform as unknown as (selection: D3Selection, transform: d3.ZoomTransform) => void,
+        currentTransform.scale(currentTransform.k * 0.8)
       );
     }
   };
@@ -437,12 +439,10 @@ const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModal
   // Handle reset zoom
   const handleResetZoom = () => {
     if (zoomRef.current && modalChartRef.current && marginRef.current) {
-      const baseSvg = d3.select(modalChartRef.current).select('svg');
+      const baseSvg = d3.select(modalChartRef.current).select('svg') as D3Selection;
       const margin = marginRef.current;
-
-      // Reset to initial transform
-      baseSvg.transition().duration(300).call(
-        zoomRef.current.transform,
+      baseSvg.call(
+        zoomRef.current.transform as unknown as (selection: D3Selection, transform: d3.ZoomTransform) => void,
         d3.zoomIdentity
           .translate(margin.left, margin.top - 20)
           .scale(0.85)

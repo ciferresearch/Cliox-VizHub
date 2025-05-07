@@ -62,7 +62,6 @@ const DataDistribution = ({
 
       // Parse CSV data
       const parsedData = d3.csvParse(csvText);
-      // console.log('Parsed data:', parsedData);
       setData(parsedData as unknown as DataPoint[]);
     } catch (err) {
       console.error('Error loading data:', err);
@@ -400,10 +399,17 @@ const DataDistribution = ({
         onClose={handleCloseModal}
         title={title}
         chartData={chartType === 'date' 
-          ? data.map(d => ({
-              time: d.time ? new Date(d.time) : null,
-              count: d.count ?? 0
-            }))
+          ? data.map(d => {
+              const timeKey = 'time' in d ? 'time' : Object.keys(d)[0];
+              const countKey = 'count' in d ? 'count' : Object.keys(d)[1];
+              const timeValue = d[timeKey as keyof typeof d] as string;
+              const countValue = +(d[countKey as keyof typeof d] as string);
+              const parsedDate = d3.timeParse('%Y-%m-%d')(timeValue);
+              return {
+                time: parsedDate,
+                count: countValue
+              };
+            }).filter(d => d.time !== null)
           : data.map(d => ({
               emails_per_day: d.emails_per_day ?? 0
             }))
