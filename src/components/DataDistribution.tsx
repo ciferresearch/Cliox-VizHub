@@ -75,7 +75,7 @@ const DataDistribution = ({
   // Fetch data on component mount
   useEffect(() => {
     fetchDistributionData();
-  }, [fetchDistributionData]);
+  }, [fetchDistributionData, skipLoading]);
 
   // Render chart when data is available
   useEffect(() => {
