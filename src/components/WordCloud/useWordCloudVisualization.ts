@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, MutableRefObject, useState, useMemo } from 'react';
+import { useEffect, useRef, useCallback, MutableRefObject, useState } from 'react';
 import * as d3 from 'd3';
 import cloud from 'd3-cloud';
 import debounce from 'lodash/debounce';

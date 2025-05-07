@@ -5,7 +5,6 @@ import {
 } from './types';
 import { 
   ENGLISH_STOPWORDS, 
-  DEFAULT_CUSTOM_STOPWORDS,
   CUSTOM_COLORS
 } from './constants';
 import { Language } from './useStoplistManager';
@@ -297,7 +296,7 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
     });
   },
   saveOptions: () => {
-    const { tempOptions, options, searchTerm } = get();
+    const { tempOptions, options } = get();
     
     // Check if options actually changed
     const optionsChanged = JSON.stringify(tempOptions) !== JSON.stringify(options);
@@ -577,10 +576,23 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
     // Calculate new value
     const newWhitelistActive = !whitelistActive;
     
+    // If turning on whitelist and it's empty, populate with example values
+    let updatedWhitelist = customWhitelist;
+    if (newWhitelistActive && customWhitelist.length === 0) {
+      // Add default example values
+      updatedWhitelist = ["important", "keyword", "significant", "relevant"];
+      
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.WHITELIST, JSON.stringify(updatedWhitelist));
+      }
+    }
+    
     // Update state directly without nested setTimeout
     // This ensures state changes are immediately applied
     set({
       whitelistActive: newWhitelistActive,
+      customWhitelist: updatedWhitelist, // Set the updated whitelist
       shouldUpdateLayout: true, // Force layout update to ensure rerendering
       isWordSelectionAction: false, // Ensure this is not treated as a word selection
       modalsOpen: false, // Ensure modals aren't blocking filter updates
@@ -859,11 +871,13 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
       // If minFrequency is 0, set it to the minimum value from the dataset
       const newMinFrequency = minFrequency === 0 ? minCount : minFrequency;
       
-      // Set the words data and update minimum frequency if needed
+      // Set the words data but DON'T immediately set filtered words,
+      // instead we'll use filterWords to properly apply filters
       set({ 
         words: data.wordCloudData,
-        filteredWords: data.wordCloudData,
         minFrequency: newMinFrequency,
+        // Force whitelistActive to false on initial load to avoid incorrect filtering
+        whitelistActive: false,
         isLoading: false
       });
       
@@ -872,13 +886,18 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
         localStorage.setItem(STORAGE_KEYS.MIN_FREQUENCY, newMinFrequency.toString());
       }
       
-      // Auto-detect stopwords after loading data
+      // Save the whitelist state explicitly to localStorage to ensure consistency
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.WHITELIST_ACTIVE, 'false');
+      }
+      
+      // Auto-detect stopwords and apply filters
       setTimeout(() => {
         get().autoDetectStopwords();
         get().filterWords();
       }, 0);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching word cloud data:', error);
       set({ 
         error: error instanceof Error ? error.message : 'An unknown error occurred',
