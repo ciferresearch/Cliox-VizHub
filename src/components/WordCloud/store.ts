@@ -122,7 +122,7 @@ const safeJsonParse = <T>(key: string, defaultValue: T): T => {
     if (typeof window === 'undefined') return defaultValue;
     const storedValue = localStorage.getItem(key);
     return storedValue ? JSON.parse(storedValue) as T : defaultValue;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`Error parsing JSON from localStorage for key "${key}":`, error);
     return defaultValue;
   }
@@ -563,7 +563,7 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
   
   toggleWhitelist: () => {
     // Get current state
-    const { whitelistActive, customWhitelist, searchTerm, selectedWord } = get();
+    const { whitelistActive, searchTerm, selectedWord } = get();
     
     // Close the panel first if it's open
     if (selectedWord) {

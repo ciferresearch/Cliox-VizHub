@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import * as d3 from 'd3';
 
 // Storage keys for different data types
 export const STORAGE_KEYS = {
@@ -8,15 +7,15 @@ export const STORAGE_KEYS = {
   EMAIL_DISTRIBUTION: 'emailDistributionData',
   SENTIMENT: 'sentimentData',
   DOCUMENT_SUMMARY: 'documentSummaryData'
-};
+} as const;
 
 // Define the types for our store
 interface DataStatus {
-  [STORAGE_KEYS.WORD_CLOUD]: boolean;
-  [STORAGE_KEYS.DATE_DISTRIBUTION]: boolean;
-  [STORAGE_KEYS.EMAIL_DISTRIBUTION]: boolean;
-  [STORAGE_KEYS.SENTIMENT]: boolean;
-  [STORAGE_KEYS.DOCUMENT_SUMMARY]: boolean;
+  wordCloudData: boolean;
+  dateDistributionData: boolean;
+  emailDistributionData: boolean;
+  sentimentData: boolean;
+  documentSummaryData: boolean;
 }
 
 export type ProcessingStatus = 'ready' | 'not_ready' | 'error';
@@ -58,7 +57,7 @@ const isDataAvailable = (dataType: string): boolean => {
 };
 
 // Helper function to parse user data based on file type
-const parseUserData = (dataType: string): any => {
+const parseUserData = (dataType: string): unknown => {
   if (typeof window === 'undefined') return null;
 
   const data = localStorage.getItem(dataType);
@@ -173,11 +172,11 @@ interface DataStore {
 export const useDataStore = create<DataStore>((set, get) => ({
   // Initial data status
   dataStatus: {
-    [STORAGE_KEYS.WORD_CLOUD]: false,
-    [STORAGE_KEYS.DATE_DISTRIBUTION]: false,
-    [STORAGE_KEYS.EMAIL_DISTRIBUTION]: false,
-    [STORAGE_KEYS.SENTIMENT]: false,
-    [STORAGE_KEYS.DOCUMENT_SUMMARY]: false
+    wordCloudData: false,
+    dateDistributionData: false,
+    emailDistributionData: false,
+    sentimentData: false,
+    documentSummaryData: false
   },
 
   // Set status for a data type
@@ -199,11 +198,11 @@ export const useDataStore = create<DataStore>((set, get) => ({
   // Check data status
   checkDataStatus: () => {
     const dataStatus = {
-      [STORAGE_KEYS.WORD_CLOUD]: isDataAvailable(STORAGE_KEYS.WORD_CLOUD),
-      [STORAGE_KEYS.DATE_DISTRIBUTION]: isDataAvailable(STORAGE_KEYS.DATE_DISTRIBUTION),
-      [STORAGE_KEYS.EMAIL_DISTRIBUTION]: isDataAvailable(STORAGE_KEYS.EMAIL_DISTRIBUTION),
-      [STORAGE_KEYS.SENTIMENT]: isDataAvailable(STORAGE_KEYS.SENTIMENT),
-      [STORAGE_KEYS.DOCUMENT_SUMMARY]: isDataAvailable(STORAGE_KEYS.DOCUMENT_SUMMARY)
+      wordCloudData: isDataAvailable(STORAGE_KEYS.WORD_CLOUD),
+      dateDistributionData: isDataAvailable(STORAGE_KEYS.DATE_DISTRIBUTION),
+      emailDistributionData: isDataAvailable(STORAGE_KEYS.EMAIL_DISTRIBUTION),
+      sentimentData: isDataAvailable(STORAGE_KEYS.SENTIMENT),
+      documentSummaryData: isDataAvailable(STORAGE_KEYS.DOCUMENT_SUMMARY)
     };
 
     set({ dataStatus });
@@ -247,11 +246,11 @@ export const useDataStore = create<DataStore>((set, get) => ({
     // Reset data status
     set({
       dataStatus: {
-        [STORAGE_KEYS.WORD_CLOUD]: false,
-        [STORAGE_KEYS.DATE_DISTRIBUTION]: false,
-        [STORAGE_KEYS.EMAIL_DISTRIBUTION]: false,
-        [STORAGE_KEYS.SENTIMENT]: false,
-        [STORAGE_KEYS.DOCUMENT_SUMMARY]: false
+        wordCloudData: false,
+        dateDistributionData: false,
+        emailDistributionData: false,
+        sentimentData: false,
+        documentSummaryData: false
       }
     });
   },

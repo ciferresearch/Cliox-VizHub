@@ -97,6 +97,7 @@ export default function Home() {
               onClick={() => {
                 localStorage.clear();
                 checkDataStatus();
+                setShowUploadModal(true)
               }}
               className="px-5 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm transition-colors cursor-pointer"
             >
@@ -123,7 +124,7 @@ export default function Home() {
               description="Shows the distribution of email counts over time"
               type="email"
               skipLoading={true}
-              disableHover={true}
+              // disableHover={true}
             />
           ) : (
             <EmptyState 
@@ -137,7 +138,7 @@ export default function Home() {
               description="Shows the distribution of emails by date"
               type="date"
               skipLoading={true}
-              disableHover={true}
+              // disableHover={true}
             />
           ) : (
             <EmptyState 

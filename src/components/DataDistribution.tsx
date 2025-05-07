@@ -12,7 +12,6 @@ interface DataDistributionProps {
   description?: string;
   type: 'email' | 'date';
   skipLoading?: boolean;
-  disableHover?: boolean;
 }
 
 interface DataPoint {
@@ -30,8 +29,7 @@ const DataDistribution = ({
   title,
   description,
   type,
-  skipLoading = false,
-  disableHover = false
+  skipLoading = false
 }: DataDistributionProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<DataPoint[]>([]);
@@ -64,7 +62,6 @@ const DataDistribution = ({
 
       // Parse CSV data
       const parsedData = d3.csvParse(csvText);
-      // console.log('Parsed data:', parsedData);
       setData(parsedData as unknown as DataPoint[]);
     } catch (err) {
       console.error('Error loading data:', err);
@@ -77,7 +74,7 @@ const DataDistribution = ({
   // Fetch data on component mount
   useEffect(() => {
     fetchDistributionData();
-  }, [fetchDistributionData]);
+  }, [fetchDistributionData, skipLoading]);
 
   // Render chart when data is available
   useEffect(() => {
@@ -244,13 +241,12 @@ const DataDistribution = ({
 
     } else if (chartType === 'email') {
       // Emails per day histogram
-      const getEmailValue = (d: any): number => {
+      const getEmailValue = (d: DataPoint): number => {
         if ('emails_per_day' in d) {
-          return +d.emails_per_day;
+          return +(d.emails_per_day ?? 0);
         }
-        // If the key isn't exactly 'emails_per_day', find the first key
         const firstKey = Object.keys(d)[0];
-        return +d[firstKey];
+        return +(d[firstKey as keyof DataPoint] ?? 0);
       };
 
       const values = data.map(getEmailValue).filter(v => !isNaN(v));
@@ -347,7 +343,7 @@ const DataDistribution = ({
       console.warn('Could not determine chart type:', { data, type });
       container.innerHTML = '<p class="text-red-500 text-center">Error: Could not determine chart type</p>';
     }
-  }, [data, chartType]);
+  }, [data, chartType, type]);
 
   // Handle opening the modal
   const handleOpenModal = () => {
@@ -402,7 +398,22 @@ const DataDistribution = ({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         title={title}
-        chartData={data}
+        chartData={chartType === 'date' 
+          ? data.map(d => {
+              const timeKey = 'time' in d ? 'time' : Object.keys(d)[0];
+              const countKey = 'count' in d ? 'count' : Object.keys(d)[1];
+              const timeValue = d[timeKey as keyof typeof d] as string;
+              const countValue = +(d[countKey as keyof typeof d] as string);
+              const parsedDate = d3.timeParse('%Y-%m-%d')(timeValue);
+              return {
+                time: parsedDate,
+                count: countValue
+              };
+            }).filter(d => d.time !== null)
+          : data.map(d => ({
+              emails_per_day: d.emails_per_day ?? 0
+            }))
+        }
         chartType={chartType}
       />
     </div>
