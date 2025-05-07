@@ -11,10 +11,17 @@ interface ChartModalProps {
   chartType: 'date' | 'email';
 }
 
+type MarginType = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
 const ChartModal = ({ isOpen, onClose, title, chartData, chartType }: ChartModalProps) => {
   const modalChartRef = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<any>(null);
-  const marginRef = useRef<{ top: number; right: number; bottom: number; left: number }>(null);
+  const marginRef = useRef<MarginType | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
