@@ -21,13 +21,17 @@ interface OptionsModalProps {
   onOpenWhitelistModal: () => void;
 }
 
-const languageOptions: { value: Language; label: string }[] = [
-  { value: 'english', label: 'English' },
-  { value: 'spanish', label: 'Spanish' },
-  { value: 'french', label: 'French' },
-  { value: 'german', label: 'German' },
-  { value: 'custom', label: 'Custom' },
-  { value: 'auto-detect', label: 'Auto-detect' },
+const languageOptions: {
+  value: Language;
+  label: string;
+  disabled?: boolean;
+}[] = [
+  { value: "english", label: "English" },
+  { value: "spanish", label: "Spanish", disabled: true },
+  { value: "french", label: "French", disabled: true },
+  { value: "german", label: "German", disabled: true },
+  { value: "custom", label: "Custom", disabled: true },
+  { value: "auto-detect", label: "Auto-detect", disabled: true },
 ];
 
 const OptionsModal: React.FC<OptionsModalProps> = ({
@@ -152,7 +156,11 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
                   title={!stoplistActive ? "Enable stopwords first to select a language" : ""}
                 >
                   {languageOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
+                    <option 
+                      key={option.value} 
+                      value={option.value}
+                      disabled={option.disabled}
+                    >
                       {option.label}
                     </option>
                   ))}
