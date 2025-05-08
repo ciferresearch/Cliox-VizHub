@@ -7,12 +7,15 @@ import WordCloud from '@/components/WordCloud';
 import DocumentSummary from '../components/DocumentSummary';
 import UploadPage from '../components/UploadPage';
 import Logo from '../components/Logo';
+import ThemeToggle from '@/components/ThemeToggle';
 import { STORAGE_KEYS, useDataStore } from '../store/dataStore';
+import { useTheme } from '@/store/themeStore';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const { checkDataStatus, dataStatus } = useDataStore();
+  const { theme } = useTheme();
   
   // Check for uploaded data
   useEffect(() => {
@@ -63,10 +66,10 @@ export default function Home() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-700">Loading...</p>
+          <p className="text-gray-700 dark:text-gray-300">Loading...</p>
         </div>
       </div>
     );
@@ -74,22 +77,27 @@ export default function Home() {
   
   // Empty state component for visualization placeholders
   const EmptyState = ({ title }: { title: string }) => (
-    <div className="bg-white rounded-lg shadow-md p-8 flex flex-col items-center justify-center min-h-[300px] text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 flex flex-col items-center justify-center min-h-[300px] text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
-      <h3 className="text-xl font-semibold mb-2 text-gray-800">{title}</h3>
-      <p className="text-gray-600 mb-1">No data available to display.</p>
-      <p className="text-gray-500 text-sm">Click the &quot;Upload Data&quot; button in the header to get started.</p>
+      <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{title}</h3>
+      <p className="text-gray-600 dark:text-gray-300 mb-1">No data available to display.</p>
+      <p className="text-gray-500 dark:text-gray-400 text-sm">Click the &quot;Upload Data&quot; button in the header to get started.</p>
     </div>
   );
   
   // Render the dashboard with visualizations or empty states
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
+    <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
       <header className="text-center mb-6">
-        <h1 className="text-3xl font-bold mb-2 text-gray-800">Text Analysis Visualization Hub</h1>
-        <p className="text-gray-600 mb-6">Interactive analysis developed by ClioX</p>
+        <div className="flex items-center justify-center mb-4">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Text Analysis Visualization Hub</h1>
+          <div className="ml-4">
+            <ThemeToggle />
+          </div>
+        </div>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">Interactive analysis developed by ClioX</p>
         
         <div className="flex justify-center gap-4">
           {Object.values(dataStatus).some(status => status) && (
@@ -183,22 +191,22 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="mt-12 text-center text-gray-500 text-sm">
+      <footer className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
         <div className="flex items-center justify-center gap-2">
-          <Logo darkMode={false} size="small" />
+          <Logo darkMode={theme === 'dark'} size="small" />
           <p>© {new Date().getFullYear()} ClioX</p>
         </div>
       </footer>
       
-      {/* Upload Modal */}
+      {/* Upload Modal - with dark mode support */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-8 py-3 bg-gray-50 flex justify-between items-center">
-              <h3 className="text-lg font-medium text-gray-800">Upload Visualization Data</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-20 dark:bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-8 py-3 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">Upload Visualization Data</h3>
               <button 
                 onClick={() => setShowUploadModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl transition-colors cursor-pointer"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-xl transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
                 ×

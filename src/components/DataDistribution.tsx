@@ -6,6 +6,7 @@ import ChartModal from './ChartModal';
 import ChartSkeleton from './ChartSkeleton';
 import ChartError from './ChartError';
 import { useDataStore } from '@/store/dataStore';
+import { useTheme } from '@/store/themeStore';
 
 interface DataDistributionProps {
   title: string;
@@ -37,6 +38,7 @@ const DataDistribution = ({
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [chartType, setChartType] = useState<'date' | 'email'>(type);
+  const { theme } = useTheme();
   
   // Get data fetching functions from store
   const { fetchEmailDistribution, fetchDateDistribution } = useDataStore();
@@ -76,7 +78,7 @@ const DataDistribution = ({
     fetchDistributionData();
   }, [fetchDistributionData, skipLoading]);
 
-  // Render chart when data is available
+  // Render chart when data is available or theme changes
   useEffect(() => {
     if (!data.length || !chartRef.current) return;
 
@@ -84,9 +86,37 @@ const DataDistribution = ({
     d3.select(chartRef.current).selectAll('*').remove();
 
     const container = chartRef.current;
+    
+    // Ensure container has a unique ID for styling
+    if (!container.id) {
+      container.id = `chart-${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
     const margin = { top: 20, right: 30, bottom: 60, left: 50 };
     const width = container.clientWidth - margin.left - margin.right;
     const height = container.clientHeight - margin.top - margin.bottom;
+
+    // Set colors based on theme
+    const textColor = theme === 'dark' ? '#e5e7eb' : '#4b5563'; // gray-200 : gray-600
+    const titleColor = theme === 'dark' ? '#d1d5db' : '#374151'; // gray-300 : gray-700
+    const strokeColor = theme === 'dark' ? '#1f2937' : '#ffffff'; // gray-800 : white
+    const gridColor = theme === 'dark' ? '#374151' : '#e5e7eb'; // gray-700 : gray-200
+    const axisColor = theme === 'dark' ? '#6b7280' : '#9ca3af'; // gray-500 : gray-400
+    const primaryColor = '#4F46E5'; // Indigo color for both themes
+    const pointColor = '#F59E0B'; // Amber color for data points
+
+    // Add CSS to style the axes based on theme
+    const style = document.createElement('style');
+    style.textContent = `
+      #${container.id} .domain,
+      #${container.id} .tick line {
+        stroke: ${axisColor};
+      }
+      #${container.id} .tick text {
+        fill: ${textColor};
+      }
+    `;
+    document.head.appendChild(style);
 
     const svg = d3.select(container)
       .append('svg')
@@ -120,7 +150,7 @@ const DataDistribution = ({
 
       if (formattedData.length === 0) {
         console.error('No valid dates found in the data');
-        container.innerHTML = '<p class="text-red-500 text-center">Error: Could not parse date data</p>';
+        container.innerHTML = '<p class="text-red-500 dark:text-red-400 text-center">Error: Could not parse date data</p>';
         return;
       }
 
@@ -149,7 +179,8 @@ const DataDistribution = ({
         .attr('transform', 'rotate(-45)')
         .style('text-anchor', 'end')
         .attr('dx', '-.8em')
-        .attr('dy', '.15em');
+        .attr('dy', '.15em')
+        .style('fill', textColor);
 
       // Add Y axis
       svg.append('g')
@@ -164,12 +195,12 @@ const DataDistribution = ({
 
       areaGradient.append('stop')
         .attr('offset', '0%')
-        .attr('stop-color', '#4F46E5')
+        .attr('stop-color', primaryColor)
         .attr('stop-opacity', 0.3);
 
       areaGradient.append('stop')
         .attr('offset', '100%')
-        .attr('stop-color', '#4F46E5')
+        .attr('stop-color', primaryColor)
         .attr('stop-opacity', 0.05);
 
       // Create area generator
@@ -197,11 +228,11 @@ const DataDistribution = ({
       svg.append('path')
         .datum(formattedData)
         .attr('fill', 'none')
-        .attr('stroke', '#4F46E5') // Indigo color for line
+        .attr('stroke', primaryColor) // Indigo color for line
         .attr('stroke-width', 2.5)
         .attr('d', line);
 
-      // Add points without hover effects
+      // Add points
       svg.selectAll('.dot')
         .data(formattedData)
         .enter()
@@ -210,18 +241,19 @@ const DataDistribution = ({
         .attr('cx', d => x(d.time!))
         .attr('cy', d => y(d.count))
         .attr('r', 3) // Smaller points
-        .attr('fill', '#F59E0B') // Amber color for points
-        .attr('stroke', '#ffffff')
+        .attr('fill', pointColor) // Amber color for points
+        .attr('stroke', strokeColor)
         .attr('stroke-width', 1.5)
         .attr('opacity', 0.8);
 
-      // Add labels
+      // Add labels with theme-aware colors
       svg.append('text')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2)
         .attr('y', height + margin.bottom - 10)
         .text('Date')
-        .attr('class', 'text-sm text-gray-600');
+        .style('fill', textColor)
+        .attr('class', 'text-sm');
 
       svg.append('text')
         .attr('text-anchor', 'middle')
@@ -229,15 +261,17 @@ const DataDistribution = ({
         .attr('y', -margin.left + 20)
         .attr('x', -height / 2)
         .text('Count')
-        .attr('class', 'text-sm text-gray-600');
+        .style('fill', textColor)
+        .attr('class', 'text-sm');
 
-      // Add title
+      // Add title with theme-aware color
       svg.append('text')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2)
         .attr('y', -5)
         .text('Email Count Over Time')
-        .attr('class', 'text-xs font-semibold text-gray-700');
+        .style('fill', titleColor)
+        .attr('class', 'text-xs font-semibold');
 
     } else if (chartType === 'email') {
       // Emails per day histogram
@@ -253,7 +287,7 @@ const DataDistribution = ({
 
       if (values.length === 0) {
         console.error('No valid email count values found');
-        container.innerHTML = '<p class="text-red-500 text-center">Error: Could not parse email count data</p>';
+        container.innerHTML = '<p class="text-red-500 dark:text-red-400 text-center">Error: Could not parse email count data</p>';
         return;
       }
 
@@ -292,12 +326,12 @@ const DataDistribution = ({
 
       barGradient.append('stop')
         .attr('offset', '0%')
-        .attr('stop-color', '#4F46E5')
+        .attr('stop-color', primaryColor)
         .attr('stop-opacity', 0.9);
 
       barGradient.append('stop')
         .attr('offset', '100%')
-        .attr('stop-color', '#4F46E5')
+        .attr('stop-color', primaryColor)
         .attr('stop-opacity', 0.6);
 
       // Add bars without hover effects for small chart
@@ -313,16 +347,17 @@ const DataDistribution = ({
         .attr('fill', 'url(#bar-gradient-' + container.id + ')') // Gradient fill
         .attr('rx', 2) // Rounded corners
         .attr('opacity', 0.9)
-        .attr('stroke', '#ffffff')
+        .attr('stroke', strokeColor)
         .attr('stroke-width', 0.5);
 
-      // Add labels
+      // Add labels with theme-aware colors
       svg.append('text')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2)
         .attr('y', height + margin.bottom - 10)
         .text('Emails per Day')
-        .attr('class', 'text-sm text-gray-600');
+        .style('fill', textColor)
+        .attr('class', 'text-sm');
 
       svg.append('text')
         .attr('text-anchor', 'middle')
@@ -330,20 +365,28 @@ const DataDistribution = ({
         .attr('y', -margin.left + 20)
         .attr('x', -height / 2)
         .text('Frequency')
-        .attr('class', 'text-sm text-gray-600');
+        .style('fill', textColor)
+        .attr('class', 'text-sm');
 
-      // Add title
+      // Add title with theme-aware color
       svg.append('text')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2)
         .attr('y', -5)
         .text('Distribution of Emails per Day')
-        .attr('class', 'text-xs font-semibold text-gray-700');
+        .style('fill', titleColor)
+        .attr('class', 'text-xs font-semibold');
     } else {
       console.warn('Could not determine chart type:', { data, type });
-      container.innerHTML = '<p class="text-red-500 text-center">Error: Could not determine chart type</p>';
+      container.innerHTML = '<p class="text-red-500 dark:text-red-400 text-center">Error: Could not determine chart type</p>';
     }
-  }, [data, chartType, type]);
+
+    return () => {
+      if (style.parentNode) {
+        document.head.removeChild(style);
+      }
+    };
+  }, [data, chartType, type, theme]);
 
   // Handle opening the modal
   const handleOpenModal = () => {
@@ -356,29 +399,30 @@ const DataDistribution = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 w-full">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">{title}</h2>
         {data.length > 0 && !loading && !error && (
           <button
             onClick={handleOpenModal}
-            className="inline-flex items-center justify-center p-1.5 rounded-md text-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer relative group"
+            className="inline-flex items-center justify-center p-1.5 rounded-md text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors cursor-pointer relative group"
             aria-label="Expand chart"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
             </svg>
-            <span className="absolute -bottom-8 right-0 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span className="absolute -bottom-8 right-0 bg-gray-800 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               Expand
             </span>
           </button>
         )}
       </div>
-      {description && <p className="text-gray-600 mb-4">{description}</p>}
+      {description && <p className="text-gray-600 dark:text-gray-300 mb-4">{description}</p>}
       
       <div
         ref={chartRef}
-        className="w-full h-64 bg-gray-50 rounded flex items-center justify-center cursor-pointer"
+        id={`chart-container-${chartType}`}
+        className="w-full h-64 bg-gray-50 dark:bg-gray-900 rounded flex items-center justify-center cursor-pointer"
         onClick={data.length > 0 && !loading && !error ? handleOpenModal : undefined}
       >
         {loading && !skipLoading ? (
@@ -389,7 +433,7 @@ const DataDistribution = ({
             onRetry={fetchDistributionData}
           />
         ) : data.length === 0 ? (
-          <p className="text-gray-500">No data available</p>
+          <p className="text-gray-500 dark:text-gray-400">No data available</p>
         ) : null}
       </div>
 

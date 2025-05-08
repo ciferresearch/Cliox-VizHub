@@ -40,7 +40,7 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
         className={`block sm:hidden ${textSizeClasses[size].mobile} font-bold`}
         style={{ fontFamily: 'var(--font-titillium-web)' }}
       >
-        <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>C</span>
+        <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>Clio</span>
         <span className={darkMode ? 'text-blue-300' : 'text-blue-700'}>X</span>
       </div>
     </div>
