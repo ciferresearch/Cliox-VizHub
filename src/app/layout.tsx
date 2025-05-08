@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Titillium_Web } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/store/themeStore";
+import Footer from "@/components/layout/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,8 +22,15 @@ const titilliumWeb = Titillium_Web({
 });
 
 export const metadata: Metadata = {
-  title: "Text Analysis Visualization Hub",
+  title: "ClioX - Text Analysis Visualization Hub",
   description: "Interactive visualizations of text analysis results by ClioX",
+  icons: {
+    icon: [
+      { url: "/temporary_logo_ClioX_light_mode.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/temporary_logo_ClioX_dark_mode.svg", media: "(prefers-color-scheme: dark)" }
+    ],
+    shortcut: "/temporary_logo_ClioX_light_mode.svg",
+  },
 };
 
 export default function RootLayout({
@@ -30,11 +39,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-gray-50 dark:bg-gray-900">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${titilliumWeb.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${titilliumWeb.variable} antialiased min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900`}
       >
-        {children}
+        <ThemeProvider>
+          <div className="flex-grow">
+            {children}
+          </div>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

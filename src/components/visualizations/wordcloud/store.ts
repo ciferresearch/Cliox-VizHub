@@ -586,6 +586,7 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
     // Save to localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.WHITELIST, JSON.stringify(updatedWhitelist));
+      localStorage.setItem(STORAGE_KEYS.WHITELIST_ACTIVE, String(newWhitelistActive));
     }
     
     // Update state
@@ -608,6 +609,9 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
         set({ searchTerm: searchTerm });
         get().filterWords(); // Update filtered words after search term is reapplied
       }, 10);
+    } else {
+      // Apply filtering immediately when no search term is present
+      get().filterWords();
     }
   },
   
@@ -855,6 +859,11 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
       // Get current min frequency
       const { minFrequency } = get();
       
+      // Check if we have a stored whitelist state in localStorage
+      const storedWhitelistActive = typeof window !== 'undefined' 
+        ? localStorage.getItem(STORAGE_KEYS.WHITELIST_ACTIVE) === 'true'
+        : false;
+      
       // If minFrequency is 0, set it to the minimum value from the dataset
       const newMinFrequency = minFrequency === 0 ? minCount : minFrequency;
       
@@ -863,19 +872,14 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
       set({ 
         words: data.wordCloudData,
         minFrequency: newMinFrequency,
-        // Force whitelistActive to false on initial load to avoid incorrect filtering
-        whitelistActive: false,
+        // Use stored whitelist state instead of forcing it to false
+        whitelistActive: storedWhitelistActive,
         isLoading: false
       });
       
       // Save min frequency to localStorage if it was updated
       if (newMinFrequency !== minFrequency && typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEYS.MIN_FREQUENCY, newMinFrequency.toString());
-      }
-      
-      // Save the whitelist state explicitly to localStorage to ensure consistency
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.WHITELIST_ACTIVE, 'false');
       }
       
       // Auto-detect stopwords and apply filters

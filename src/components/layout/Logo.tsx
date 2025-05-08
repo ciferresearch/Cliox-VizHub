@@ -1,4 +1,5 @@
 import { ReactElement } from 'react';
+import Link from 'next/link';
 
 interface LogoProps {
   darkMode?: boolean;
@@ -22,11 +23,13 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
     }
   };
 
+  const unselectable = 'select-none cursor-pointer';
+
   return (
-    <div className="relative">
+    <Link href="/" className="relative">
       {/* Desktop and tablet logo */}
       <div 
-        className={`hidden sm:block ${textSizeClasses[size].desktop} font-bold tracking-tight`}
+        className={`hidden sm:block ${textSizeClasses[size].desktop} font-bold tracking-tight ${unselectable}`}
         style={{ fontFamily: 'var(--font-titillium-web)' }}
       >
         <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>
@@ -37,12 +40,12 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
       
       {/* Mobile logo */}
       <div 
-        className={`block sm:hidden ${textSizeClasses[size].mobile} font-bold`}
+        className={`block sm:hidden ${textSizeClasses[size].mobile} font-bold ${unselectable}`}
         style={{ fontFamily: 'var(--font-titillium-web)' }}
       >
-        <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>C</span>
+        <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>Clio</span>
         <span className={darkMode ? 'text-blue-300' : 'text-blue-700'}>X</span>
       </div>
-    </div>
+    </Link>
   );
 } 

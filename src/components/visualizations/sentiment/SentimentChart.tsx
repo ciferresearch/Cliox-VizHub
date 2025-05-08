@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import { useDataStore } from '@/store/dataStore';
+import { useTheme } from '@/store/themeStore';
 
 interface SentimentData {
   name: string;
@@ -68,7 +69,7 @@ interface SentimentChartProps {
   skipLoading?: boolean;
 }
 
-const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
+const SentimentChart = ({ skipLoading = false }: SentimentChartProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const brushRef = useRef<HTMLDivElement>(null);
   const [chartWidth, setChartWidth] = useState(0);
@@ -77,6 +78,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
   const [loading, setLoading] = useState(true);
   const tooltipRef = useRef<d3.Selection<HTMLDivElement, unknown, null, undefined> | null>(null);
   const verticalLineRef = useRef<d3.Selection<SVGLineElement, unknown, null, undefined> | null>(null);
+  const { theme } = useTheme();
 
   const { fetchSentimentData } = useDataStore();
 
@@ -138,20 +140,36 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
 
     const container = d3.select(chartRef.current);
 
+    // Set theme-aware colors
+    const textColor = theme === 'dark' ? '#e5e7eb' : '#4b5563'; // gray-200 : gray-600
+    const mutedTextColor = theme === 'dark' ? '#9ca3af' : '#6b7280'; // gray-400 : gray-500
+    const axisColor = theme === 'dark' ? '#4b5563' : '#d1d5db'; // gray-600 : gray-300
+    const gridColor = theme === 'dark' ? '#374151' : '#e5e7eb'; // gray-700 : gray-200
+    const tooltipBg = theme === 'dark' ? 'rgba(31, 41, 55, 0.9)' : 'rgba(255, 255, 255, 0.9)'; // gray-800 : white
+    const tooltipBorder = theme === 'dark' ? '#4b5563' : '#d1d5db'; // gray-600 : gray-300
+    const tooltipTextColor = theme === 'dark' ? '#e5e7eb' : '#4b5563'; // gray-200 : gray-600
+
     if (!tooltipRef.current) {
       tooltipRef.current = container.append('div')
         .attr('class', 'tooltip')
         .style('position', 'absolute')
         .style('visibility', 'hidden')
-        .style('background-color', 'rgba(255, 255, 255, 0.9)')
-        .style('border', '1px solid #ddd')
+        .style('background-color', tooltipBg)
+        .style('border', `1px solid ${tooltipBorder}`)
         .style('border-radius', '4px')
         .style('padding', '8px')
-        .style('box-shadow', '2px 2px 6px rgba(0, 0, 0, 0.2)')
+        .style('box-shadow', `2px 2px 6px ${theme === 'dark' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.2)'}`)
         .style('pointer-events', 'none')
         .style('font-size', '12px')
         .style('z-index', '10')
+        .style('color', tooltipTextColor)
         .style('transition', 'left 0.15s ease-out, top 0.15s ease-out');
+    } else {
+      tooltipRef.current
+        .style('background-color', tooltipBg)
+        .style('border', `1px solid ${tooltipBorder}`)
+        .style('box-shadow', `2px 2px 6px ${theme === 'dark' ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.2)'}`)
+        .style('color', tooltipTextColor);
     }
 
     container.selectAll('svg').remove();
@@ -197,6 +215,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         .attr('x', width / 2)
         .attr('y', totalHeight / 2)
         .attr('text-anchor', 'middle')
+        .style('fill', textColor)
         .text('No data points in the selected date range');
       return;
     }
@@ -232,7 +251,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         .attr('width', width)
         .attr('height', chartHeight)
         .style('fill', 'none')
-        .style('stroke', '#eaeaea')
+        .style('stroke', gridColor)
         .style('stroke-width', 0.25);
 
       svg.append('text')
@@ -241,7 +260,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         .attr('text-anchor', 'end')
         .attr('dominant-baseline', 'middle')
         .attr('class', 'text-xs font-medium')
-        .style('fill', getSentimentColor(String(series.name)))
+        .style('fill', getSentimentColor(String(series.name), theme))
         .text(series.name);
 
       const sentimentLabel = () => {
@@ -262,7 +281,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         .attr('y', yPos + 15)
         .attr('class', 'text-xs')
         .style('opacity', 0.7)
-        .style('fill', getSentimentColor(String(series.name)))
+        .style('fill', getSentimentColor(String(series.name), theme))
         .text(sentimentLabel());
 
       const gradientId = `gradient-${i}`;
@@ -276,12 +295,12 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
 
       gradient.append('stop')
         .attr('offset', '0%')
-        .attr('stop-color', getSentimentColor(String(series.name)))
+        .attr('stop-color', getSentimentColor(String(series.name), theme))
         .attr('stop-opacity', 0.95);
 
       gradient.append('stop')
         .attr('offset', '100%')
-        .attr('stop-color', getSentimentColor(String(series.name)))
+        .attr('stop-color', getSentimentColor(String(series.name), theme))
         .attr('stop-opacity', 0.6);
 
       const area = d3.area<FormattedDataPoint>()
@@ -304,7 +323,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         .attr('x2', width)
         .attr('y1', chartHeight)
         .attr('y2', chartHeight)
-        .style('stroke', '#ddd')
+        .style('stroke', gridColor)
         .style('stroke-width', 0.5);
     });
 
@@ -322,8 +341,9 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
           })
       )
       .attr('class', 'text-xs')
-      .call(g => g.select('.domain').attr('stroke-width', 0.5))
-      .call(g => g.selectAll('.tick line').attr('stroke-width', 0.5));
+      .call(g => g.select('.domain').attr('stroke-width', 0.5).attr('stroke', axisColor))
+      .call(g => g.selectAll('.tick line').attr('stroke-width', 0.5).attr('stroke', axisColor))
+      .call(g => g.selectAll('.tick text').attr('fill', textColor));
 
     const monthsPerYear = width > 800 ? 4 : width > 600 ? 3 : 2;
     const startYear = dateRange.start.getFullYear();
@@ -345,13 +365,14 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         .attr('x', x(date))
         .attr('y', chartCount * (chartHeight + spacing) - spacing + 25)
         .attr('text-anchor', 'middle')
-        .attr('class', 'text-xs text-gray-500')
+        .attr('class', 'text-xs')
+        .style('fill', mutedTextColor)
         .text(d3.timeFormat('%b')(date));
     });
 
     const verticalLine = svg.append('line')
       .attr('class', 'vertical-line')
-      .style('stroke', '#999')
+      .style('stroke', theme === 'dark' ? '#9ca3af' : '#999')
       .style('stroke-width', '1px')
       .style('stroke-dasharray', '3,3')
       .style('opacity', 0)
@@ -424,7 +445,8 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
           .attr('x1', x(selectedDate))
           .attr('x2', x(selectedDate));
 
-        let tooltipContent = `<div class="font-medium text-xs mb-1" style="color:#555;">${formatDate()(selectedDate)}</div>`;
+        const tooltipHeaderColor = theme === 'dark' ? '#d1d5db' : '#555'; // gray-300 : dark gray
+        let tooltipContent = `<div class="font-medium text-xs mb-1" style="color:${tooltipHeaderColor};">${formatDate()(selectedDate)}</div>`;
 
         tooltipContent += `<div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">`;
 
@@ -434,8 +456,8 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
 
           tooltipContent += `
             <div class="flex items-center">
-              <span class="inline-block w-2 h-2 mr-1" style="background-color: ${getSentimentColor(String(series.name))};"></span>
-              <span style="color:#555;">Sentiment ${series.name}</span>
+              <span class="inline-block w-2 h-2 mr-1" style="background-color: ${getSentimentColor(String(series.name), theme)};"></span>
+              <span style="color:${tooltipHeaderColor};">Sentiment ${series.name}</span>
             </div>
             <div class="font-medium text-right">${value}</div>
           `;
@@ -466,7 +488,7 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         if (tooltipRef.current) tooltipRef.current.style('visibility', 'hidden');
         verticalLine.style('opacity', 0);
       });
-  }, [chartRef, dateRange, sentimentData, formatDate]);
+  }, [chartRef, dateRange, sentimentData, formatDate, theme]);
 
   const renderBrush = useCallback(() => {
     if (!brushRef.current || !dateRange) return;
@@ -474,6 +496,12 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
     const container = d3.select(brushRef.current);
     container.selectAll('svg').remove();
 
+    // Set theme-aware colors
+    const textColor = theme === 'dark' ? '#e5e7eb' : '#4b5563'; // gray-200 : gray-600
+    const axisColor = theme === 'dark' ? '#4b5563' : '#ccc'; // gray-600 : light gray
+    const brushHandleColor = theme === 'dark' ? '#6b7280' : '#69b3a2'; // gray-500 : teal
+    const brushFillColor = theme === 'dark' ? 'rgba(107, 114, 128, 0.3)' : 'rgba(105, 179, 162, 0.3)'; // gray-500 : teal with opacity
+    
     const margin = { top: 10, right: 40, bottom: 20, left: 50 };
     const width = brushRef.current.clientWidth - margin.left - margin.right;
     const height = 60 - margin.top - margin.bottom;
@@ -533,9 +561,9 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
           .datum(series.values)
           .attr('class', 'mini-area')
           .attr('d', area as any)
-          .style('fill', getSentimentColor(String(series.name)))
+          .style('fill', getSentimentColor(String(series.name), theme))
           .style('fill-opacity', 0.3)
-          .style('stroke', getSentimentColor(String(series.name)))
+          .style('stroke', getSentimentColor(String(series.name), theme))
           .style('stroke-width', 0.75)
           .style('stroke-opacity', 0.8);
       }
@@ -554,11 +582,12 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
         }))
       .call(g => g.select('.domain').remove())
       .call(g => g.selectAll('.tick line')
-        .attr('stroke', '#ccc')
+        .attr('stroke', axisColor)
         .attr('stroke-dasharray', '2,2'))
       .call(g => g.selectAll('.tick text')
         .style('text-anchor', 'middle')
-        .attr('dy', '1em'));
+        .attr('dy', '1em')
+        .attr('fill', textColor));
 
     const brush = d3.brushX()
       .extent([[0, 0], [width, height]])
@@ -585,62 +614,74 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
     }
 
     svg.selectAll('.selection')
-      .attr('fill', '#69b3a2')
-      .attr('fill-opacity', 0.3)
-      .attr('stroke', '#69b3a2');
+      .attr('fill', brushFillColor)
+      .attr('stroke', brushHandleColor);
 
     svg.selectAll('.handle')
-      .attr('fill', '#69b3a2')
-      .attr('stroke', '#69b3a2')
+      .attr('fill', brushHandleColor)
+      .attr('stroke', brushHandleColor)
       .attr('stroke-width', 0.5);
 
-    const _resetButton = container
+    const resetButton = container
       .append('button')
       .attr('class', 'reset-button')
       .style('position', 'absolute')
       .style('top', '10px')
       .style('right', '40px')
-      .style('background-color', '#f3f4f6')
-      .style('border', '1px solid #d1d5db')
+      .style('background-color', theme === 'dark' ? '#374151' : '#f3f4f6') // gray-700 : gray-100
+      .style('border', `1px solid ${theme === 'dark' ? '#4b5563' : '#d1d5db'}`) // gray-600 : gray-300
       .style('border-radius', '4px')
       .style('padding', '2px 8px')
       .style('font-size', '10px')
       .style('cursor', 'pointer')
+      .style('color', theme === 'dark' ? '#e5e7eb' : 'inherit') // gray-200 : default
       .text('Reset Zoom')
       .on('click', () => {
         setDateRange({ start: fullDateRange[0], end: fullDateRange[1] });
       });
-  }, [brushRef, dateRange]);
+  }, [brushRef, dateRange, theme]);
 
   useEffect(() => {
     renderChart();
     renderBrush();
   }, [renderChart, renderBrush]);
 
-  const getSentimentColor = (sentiment: string): string => {
-    switch (sentiment) {
-      case '-2': return '#4fc3f7';
-      case '-1': return '#9575cd';
-      case '0': return '#e0e0e0';
-      case '+1': return '#ffb74d';
-      case '+2': return '#ff8a65';
-      default: return '#e0e0e0';
+  const getSentimentColor = (sentiment: string, currentTheme: string = 'light'): string => {
+    // Slightly adjust colors for dark mode to ensure visibility
+    if (currentTheme === 'dark') {
+      switch (sentiment) {
+        case '-2': return '#63ccfa'; // Brighter blue
+        case '-1': return '#af8fe0'; // Brighter purple
+        case '0': return '#f3f4f6';  // Light gray
+        case '+1': return '#ffc069'; // Brighter orange
+        case '+2': return '#ff9f7b'; // Brighter coral
+        default: return '#f3f4f6';   // Light gray
+      }
+    } else {
+      switch (sentiment) {
+        case '-2': return '#4fc3f7';
+        case '-1': return '#9575cd';
+        case '0': return '#e0e0e0';
+        case '+1': return '#ffb74d';
+        case '+2': return '#ff8a65';
+        default: return '#e0e0e0';
+      }
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 w-full">
-      <h2 className="text-xl font-semibold mb-2 text-gray-800 border-b border-gray-200 pb-2">Sentiment Analysis by Category</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
+      <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">Sentiment Analysis by Category</h2>
 
       {loading && !skipLoading ? (
         <div className="flex items-center justify-center h-[400px]">
-          <p className="text-gray-500">Loading sentiment data...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading sentiment data...</p>
         </div>
       ) : (
         <>
           <div ref={chartRef} className="w-full relative"></div>
 
-          <div className="text-xs text-gray-500 mt-4 mb-1 ml-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-4 mb-1 ml-1">
             Drag to select date range:
           </div>
 
@@ -651,4 +692,4 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
   );
 };
 
-export default SentimentChartV2;
+export default SentimentChart;
