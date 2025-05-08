@@ -108,7 +108,7 @@ export default function Home() {
 
             <VisualizationWrapper 
               isAvailable={dataStatus[STORAGE_KEYS.SENTIMENT]} 
-              title="Sentiment Analysis"
+                  title="Sentiment Analysis" 
             >
               <SentimentChart skipLoading={true} />
             </VisualizationWrapper>
@@ -117,14 +117,14 @@ export default function Home() {
               isAvailable={dataStatus[STORAGE_KEYS.WORD_CLOUD]} 
               title="Word Cloud"
             >
-              <WordCloud />
+                <WordCloud />
             </VisualizationWrapper>
 
             <VisualizationWrapper 
               isAvailable={dataStatus[STORAGE_KEYS.DOCUMENT_SUMMARY]} 
               title="Document Summary"
             >
-              <DocumentSummary skipLoading={true} />
+                <DocumentSummary skipLoading={true} />
             </VisualizationWrapper>
 
             <FutureFeatures />
