@@ -385,7 +385,7 @@ const WordCloud: React.FC<WordCloudProps> = ({ skipLoading = false }) => {
                   const newValue = Number(e.target.value);
                   setMinFrequency(newValue);
                 }}
-                className="w-full cursor-pointer accent-indigo-600 dark:accent-indigo-400"
+                className="w-full cursor-pointer accent-blue-500 dark:accent-blue-300"
               />
             )}
           </div>
@@ -406,7 +406,7 @@ const WordCloud: React.FC<WordCloudProps> = ({ skipLoading = false }) => {
                 onChange={(e) => {
                   setMaxWords(Number(e.target.value));
                 }}
-                className="w-full cursor-pointer accent-indigo-600 dark:accent-indigo-400"
+                className="w-full cursor-pointer accent-blue-500 dark:accent-blue-300"
               />
             )}
           </div>

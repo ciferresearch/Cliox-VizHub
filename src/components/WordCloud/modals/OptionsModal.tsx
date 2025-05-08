@@ -110,7 +110,7 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
                     type="checkbox"
                     checked={stoplistActive}
                     onChange={toggleStoplist}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-800"
                   />
                   <label htmlFor="stoplist-toggle" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Enable Stopwords
@@ -180,7 +180,7 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
                     type="checkbox"
                     checked={whitelistActive}
                     onChange={toggleWhitelist}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-800"
                   />
                   <label htmlFor="whitelist-toggle" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Enable Whitelist
@@ -269,7 +269,7 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
                 onChange={(e) => 
                   updateOption('applyGlobally', e.target.checked)
                 }
-                className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+                className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-800"
               />
               <label htmlFor="applyGlobally" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Apply settings globally to all word clouds

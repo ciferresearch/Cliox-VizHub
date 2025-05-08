@@ -7,7 +7,6 @@ import WordCloud from '@/components/WordCloud';
 import DocumentSummary from '../components/DocumentSummary';
 import UploadPage from '../components/UploadPage';
 import Logo from '../components/Logo';
-import ThemeToggle from '@/components/ThemeToggle';
 import { STORAGE_KEYS, useDataStore } from '../store/dataStore';
 import { useTheme } from '@/store/themeStore';
 
@@ -93,9 +92,6 @@ export default function Home() {
       <header className="text-center mb-6">
         <div className="flex items-center justify-center mb-4">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Text Analysis Visualization Hub</h1>
-          <div className="ml-4">
-            <ThemeToggle />
-          </div>
         </div>
         <p className="text-gray-600 dark:text-gray-400 mb-6">Interactive analysis developed by ClioX</p>
         
@@ -200,7 +196,7 @@ export default function Home() {
       
       {/* Upload Modal - with dark mode support */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 dark:bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-opacity-20 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="px-8 py-3 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">Upload Visualization Data</h3>
