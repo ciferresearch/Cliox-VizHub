@@ -400,7 +400,7 @@ const DataDistribution = ({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">{title}</h2>
         {data.length > 0 && !loading && !error && (
           <button

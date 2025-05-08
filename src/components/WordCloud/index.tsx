@@ -339,8 +339,8 @@ const WordCloud: React.FC<WordCloudProps> = ({ skipLoading = false }) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full overflow-hidden">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 pb-2">Word Cloud</h2>
+      <div className="flex items-center justify-between mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">Word Cloud</h2>
         <button
           onClick={openOptionsModal}
           className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium cursor-pointer"
