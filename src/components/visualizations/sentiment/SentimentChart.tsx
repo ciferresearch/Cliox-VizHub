@@ -69,7 +69,7 @@ interface SentimentChartProps {
   skipLoading?: boolean;
 }
 
-const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
+const SentimentChart = ({ skipLoading = false }: SentimentChartProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const brushRef = useRef<HTMLDivElement>(null);
   const [chartWidth, setChartWidth] = useState(0);
@@ -692,4 +692,4 @@ const SentimentChartV2 = ({ skipLoading = false }: SentimentChartProps) => {
   );
 };
 
-export default SentimentChartV2;
+export default SentimentChart;

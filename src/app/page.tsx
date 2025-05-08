@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import SentimentChartV2 from '@/components/SentimentChart_v2';
-import DataDistribution from '@/components/DataDistribution';
-import WordCloud from '@/components/WordCloud';
-import DocumentSummary from '@/components/DocumentSummary';
-import UploadPage from '@/components/UploadPage';
+import SentimentChart from '@/components/visualizations/sentiment/SentimentChart';
+import DataDistribution from '@/components/visualizations/distribution/DataDistribution';
+import WordCloud from '@/components/visualizations/wordcloud';
+import DocumentSummary from '@/components/visualizations/summary/DocumentSummary';
+import UploadPage from '@/components/ui/upload/UploadPage';
 import Logo from '@/components/layout/Logo';
 import Header from '@/components/layout/Header';
 import { STORAGE_KEYS, useDataStore } from '@/store/dataStore';
@@ -127,7 +127,7 @@ export default function Home() {
 
             <div className="mb-6">
               {dataStatus[STORAGE_KEYS.SENTIMENT] ? (
-                <SentimentChartV2 skipLoading={true} />
+                <SentimentChart skipLoading={true} />
               ) : (
                 <EmptyState 
                   title="Sentiment Analysis" 

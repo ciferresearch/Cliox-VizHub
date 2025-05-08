@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import ChartError from './ChartError';
+import ChartError from '@/components/ui/common/ChartError';
 import { useDataStore } from '@/store/dataStore';
 
 interface DocumentSummary {

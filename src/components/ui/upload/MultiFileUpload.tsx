@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDataStore, STORAGE_KEYS } from '../store/dataStore';
+import { useDataStore, STORAGE_KEYS } from '@/store/dataStore';
 import JSZip from 'jszip';
 
 interface MultiFileUploadProps {

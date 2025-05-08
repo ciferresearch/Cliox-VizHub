@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDataStore } from '../store/dataStore';
+import { useDataStore } from '@/store/dataStore';
 import MultiFileUpload from './MultiFileUpload';
 
 interface UploadPageProps {

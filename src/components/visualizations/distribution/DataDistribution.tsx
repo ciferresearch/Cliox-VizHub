@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import ChartModal from './ChartModal';
-import ChartSkeleton from './ChartSkeleton';
-import ChartError from './ChartError';
+import ChartSkeleton from '@/components/ui/common/ChartSkeleton';
+import ChartError from '@/components/ui/common/ChartError';
 import { useDataStore } from '@/store/dataStore';
 import { useTheme } from '@/store/themeStore';
 

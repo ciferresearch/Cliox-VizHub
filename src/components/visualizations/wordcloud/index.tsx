@@ -5,7 +5,7 @@ import { useWordCloudVisualization } from "./useWordCloudVisualization";
 import OptionsModal from "./modals/OptionsModal";
 import ListEditModal from "./modals/ListEditModal";
 import WordDetailPanel from "./WordDetailPanel";
-import ChartError from "../ChartError";
+import ChartError from "@/components/ui/common/ChartError";
 import debounce from "lodash/debounce";
 import { useWordCloudStore } from "./store";
 import { useTheme } from "@/store/themeStore";
