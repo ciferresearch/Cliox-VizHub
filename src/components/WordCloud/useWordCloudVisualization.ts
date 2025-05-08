@@ -588,6 +588,7 @@ export const useWordCloudVisualization = ({
         .attr("font-size", "20px")
         .attr("font-weight", "bold")
         .attr("fill", "#555")
+        .attr("dy", "-0.07em")
         .text("+");
 
       // Zoom out button
@@ -622,6 +623,7 @@ export const useWordCloudVisualization = ({
         .attr("font-size", "24px")
         .attr("font-weight", "bold")
         .attr("fill", "#555")
+        .attr("dy", "-0.07em")
         .text("−");
 
       // Reset zoom button
@@ -639,28 +641,36 @@ export const useWordCloudVisualization = ({
           if (zoomRef.current) {
             const width = parseInt(svg.style("width"));
             const height = parseInt(svg.style("height"));
-            svg.transition().duration(300).call(
-              zoomRef.current.transform, 
-              d3.zoomIdentity.translate(width/2, height/2).scale(0.87).translate(-width/2, -height/2)
-            );
+            svg
+              .transition()
+              .duration(300)
+              .call(
+                zoomRef.current.transform,
+                d3.zoomIdentity
+                  .translate(width / 2, height / 2)
+                  .scale(0.87)
+                  .translate(-width / 2, -height / 2)
+              );
           }
         });
 
       setupButtonHover(resetButton);
 
-      // Home icon for reset
+      // Home icon for reset - using a more precise SVG path
       const resetIcon = zoomControls
         .append("g")
-        .attr("transform", `translate(20, ${topPadding + buttonSpacing * 2})`)
+        .attr("transform", `translate(20, ${topPadding + buttonSpacing * 2 + 0.5})`)
         .attr("pointer-events", "none");
 
-      // Draw a simple house shape
+      // Draw a simple house shape with better centering
       resetIcon
         .append("path")
-        .attr("d", "M-6,-4 L0,-8 L6,-4 L6,4 L2,4 L2,0 L-2,0 L-2,4 L-6,4 Z")
+        .attr(
+          "d",
+          "M-5.5,-3 L0,-7 L5.5,-3 L5.5,4 L2,4 L2,0 L-2,0 L-2,4 L-5.5,4 Z"
+        )
         .attr("fill", "#555")
-        .attr("stroke", "#555")
-        .attr("stroke-width", 0.5);
+        .attr("stroke", "none");
     }
 
     // Add resize observer for responsive centering
