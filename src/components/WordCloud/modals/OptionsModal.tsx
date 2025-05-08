@@ -161,7 +161,7 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
               
               <p className="mt-2 text-xs text-gray-500">
                 {stoplistActive 
-                  ? 'Stopwords are common words (like &quot;the&quot;, &quot;and&quot;, &quot;to&quot;) that will be filtered out of the visualization.' 
+                  ? 'Stopwords are common words (like "the", "and", "to") that will be filtered out of the visualization.' 
                   : 'Stopwords filtering is disabled.'}
               </p>
               
