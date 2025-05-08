@@ -105,13 +105,20 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
-                  <input
-                    id="stoplist-toggle"
-                    type="checkbox"
-                    checked={stoplistActive}
-                    onChange={toggleStoplist}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-800"
-                  />
+                  <div className="relative flex items-center">
+                    <input
+                      id="stoplist-toggle"
+                      type="checkbox"
+                      checked={stoplistActive}
+                      onChange={toggleStoplist}
+                      className="appearance-none h-4 w-4 rounded border border-gray-300 dark:border-gray-700 checked:bg-blue-600 dark:checked:bg-blue-500 focus:focus-visible:outline-none focus:focus-visible:ring-2 focus:focus-visible:ring-blue-500 dark:focus:focus-visible:ring-blue-600 cursor-pointer"
+                    />
+                    {stoplistActive && (
+                      <svg className="absolute w-4 h-4 pointer-events-none text-white" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
                   <label htmlFor="stoplist-toggle" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Enable Stopwords
                   </label>
@@ -175,13 +182,20 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
-                  <input
-                    id="whitelist-toggle"
-                    type="checkbox"
-                    checked={whitelistActive}
-                    onChange={toggleWhitelist}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-800"
-                  />
+                  <div className="relative flex items-center">
+                    <input
+                      id="whitelist-toggle"
+                      type="checkbox"
+                      checked={whitelistActive}
+                      onChange={toggleWhitelist}
+                      className="appearance-none h-4 w-4 rounded border border-gray-300 dark:border-gray-700 checked:bg-blue-600 dark:checked:bg-blue-500 focus:focus-visible:outline-none focus:focus-visible:ring-2 focus:focus-visible:ring-blue-500 dark:focus:focus-visible:ring-blue-600 cursor-pointer"
+                    />
+                    {whitelistActive && (
+                      <svg className="absolute w-4 h-4 pointer-events-none text-white" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
                   <label htmlFor="whitelist-toggle" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Enable Whitelist
                   </label>
@@ -262,15 +276,22 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
 
             {/* Apply Globally */}
             <div className="flex items-center mt-4">
-              <input
-                type="checkbox"
-                id="applyGlobally"
-                checked={tempOptions.applyGlobally}
-                onChange={(e) => 
-                  updateOption('applyGlobally', e.target.checked)
-                }
-                className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-800"
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  id="applyGlobally"
+                  checked={tempOptions.applyGlobally}
+                  onChange={(e) => 
+                    updateOption('applyGlobally', e.target.checked)
+                  }
+                  className="appearance-none h-4 w-4 rounded border border-gray-300 dark:border-gray-700 checked:bg-blue-600 dark:checked:bg-blue-500 focus:focus-visible:outline-none focus:focus-visible:ring-2 focus:focus-visible:ring-blue-500 dark:focus:focus-visible:ring-blue-600 cursor-pointer"
+                />
+                {tempOptions.applyGlobally && (
+                  <svg className="absolute w-4 h-4 pointer-events-none text-white" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </div>
               <label htmlFor="applyGlobally" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Apply settings globally to all word clouds
               </label>
