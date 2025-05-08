@@ -3,7 +3,7 @@
 import Logo from './Logo';
 import { useTheme } from '@/store/themeStore';
 import { useDataStore } from '@/store/dataStore';
-import Dialog from './ui/Dialog';
+import Dialog from '@/components/ui/Dialog';
 import { useState } from 'react';
 
 interface HeaderProps {

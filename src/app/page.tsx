@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import SentimentChartV2 from '../components/SentimentChart_v2';
-import DataDistribution from '../components/DataDistribution';
+import SentimentChartV2 from '@/components/SentimentChart_v2';
+import DataDistribution from '@/components/DataDistribution';
 import WordCloud from '@/components/WordCloud';
-import DocumentSummary from '../components/DocumentSummary';
-import UploadPage from '../components/UploadPage';
-import Logo from '../components/Logo';
-import Header from '../components/Header';
-import { STORAGE_KEYS, useDataStore } from '../store/dataStore';
+import DocumentSummary from '@/components/DocumentSummary';
+import UploadPage from '@/components/UploadPage';
+import Logo from '@/components/layout/Logo';
+import Header from '@/components/layout/Header';
+import { STORAGE_KEYS, useDataStore } from '@/store/dataStore';
 import { useTheme } from '@/store/themeStore';
 
 export default function Home() {
@@ -160,13 +160,6 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-300">Additional visualizations and analysis tools will be added here.</p>
             </div>
           </main>
-
-          <footer className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
-            <div className="flex items-center justify-center gap-2">
-              <Logo darkMode={theme === 'dark'} size="small" />
-              <p>© {new Date().getFullYear()} ClioX</p>
-            </div>
-          </footer>
         </div>
       </div>
       

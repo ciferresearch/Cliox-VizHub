@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Titillium_Web } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/store/themeStore";
+import Footer from "@/components/layout/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,11 +38,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-gray-50 dark:bg-gray-900">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${titilliumWeb.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${titilliumWeb.variable} antialiased min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <div className="flex-grow">
+            {children}
+          </div>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
