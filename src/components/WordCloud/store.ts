@@ -586,6 +586,7 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
     // Save to localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEYS.WHITELIST, JSON.stringify(updatedWhitelist));
+      localStorage.setItem(STORAGE_KEYS.WHITELIST_ACTIVE, String(newWhitelistActive));
     }
     
     // Update state
@@ -608,6 +609,9 @@ export const useWordCloudStore = create<WordCloudStore>((set, get) => ({
         set({ searchTerm: searchTerm });
         get().filterWords(); // Update filtered words after search term is reapplied
       }, 10);
+    } else {
+      // Apply filtering immediately when no search term is present
+      get().filterWords();
     }
   },
   
