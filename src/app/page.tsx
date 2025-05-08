@@ -7,6 +7,7 @@ import WordCloud from '@/components/WordCloud';
 import DocumentSummary from '../components/DocumentSummary';
 import UploadPage from '../components/UploadPage';
 import Logo from '../components/Logo';
+import Header from '../components/Header';
 import { STORAGE_KEYS, useDataStore } from '../store/dataStore';
 import { useTheme } from '@/store/themeStore';
 
@@ -88,111 +89,86 @@ export default function Home() {
   
   // Render the dashboard with visualizations or empty states
   return (
-    <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
-      <header className="text-center mb-6">
-        <div className="flex items-center justify-center mb-4">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Text Analysis Visualization Hub</h1>
-        </div>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">Interactive analysis developed by ClioX</p>
-        
-        <div className="flex justify-center gap-4">
-          {Object.values(dataStatus).some(status => status) && (
-            <button
-              onClick={() => {
-                localStorage.clear();
-                checkDataStatus();
-                setShowUploadModal(true)
-              }}
-              className="px-5 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm transition-colors cursor-pointer"
-            >
-              Clear All Data
-            </button>
-          )}
-          <button
-            onClick={() => setShowUploadModal(true)}
-            className="px-5 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            Upload Data
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Header onUploadClick={() => setShowUploadModal(true)} />
+      
+      <div className="p-6">
+        <div className="max-w-6xl mx-auto">
+          <main>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {dataStatus[STORAGE_KEYS.EMAIL_DISTRIBUTION] ? (
+                <DataDistribution
+                  title="Data Distribution on Email Counts"
+                  description="Shows the distribution of email counts over time"
+                  type="email"
+                  skipLoading={true}
+                  // disableHover={true}
+                />
+              ) : (
+                <EmptyState 
+                  title="Email Distribution" 
+                />
+              )}
+              
+              {dataStatus[STORAGE_KEYS.DATE_DISTRIBUTION] ? (
+                <DataDistribution
+                  title="Data Distribution on Date"
+                  description="Shows the distribution of emails by date"
+                  type="date"
+                  skipLoading={true}
+                  // disableHover={true}
+                />
+              ) : (
+                <EmptyState 
+                  title="Date Distribution" 
+                />
+              )}
+            </div>
 
-      <main className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {dataStatus[STORAGE_KEYS.EMAIL_DISTRIBUTION] ? (
-            <DataDistribution
-              title="Data Distribution on Email Counts"
-              description="Shows the distribution of email counts over time"
-              type="email"
-              skipLoading={true}
-              // disableHover={true}
-            />
-          ) : (
-            <EmptyState 
-              title="Email Distribution" 
-            />
-          )}
-          
-          {dataStatus[STORAGE_KEYS.DATE_DISTRIBUTION] ? (
-            <DataDistribution
-              title="Data Distribution on Date"
-              description="Shows the distribution of emails by date"
-              type="date"
-              skipLoading={true}
-              // disableHover={true}
-            />
-          ) : (
-            <EmptyState 
-              title="Date Distribution" 
-            />
-          )}
-        </div>
+            <div className="mb-6">
+              {dataStatus[STORAGE_KEYS.SENTIMENT] ? (
+                <SentimentChartV2 skipLoading={true} />
+              ) : (
+                <EmptyState 
+                  title="Sentiment Analysis" 
+                />
+              )}
+            </div>
 
-        <div className="mb-6">
-          {dataStatus[STORAGE_KEYS.SENTIMENT] ? (
-            <SentimentChartV2 skipLoading={true} />
-          ) : (
-            <EmptyState 
-              title="Sentiment Analysis" 
-            />
-          )}
-        </div>
+            <div className="mb-6">
+              {dataStatus[STORAGE_KEYS.WORD_CLOUD] ? (
+                <WordCloud />
+              ) : (
+                <EmptyState 
+                  title="Word Cloud" 
+                />
+              )}
+            </div>
 
-        <div className="mb-6">
-          {dataStatus[STORAGE_KEYS.WORD_CLOUD] ? (
-            <WordCloud />
-          ) : (
-            <EmptyState 
-              title="Word Cloud" 
-            />
-          )}
-        </div>
+            <div className="mb-6">
+              {dataStatus[STORAGE_KEYS.DOCUMENT_SUMMARY] ? (
+                <DocumentSummary skipLoading={true} />
+              ) : (
+                <EmptyState 
+                  title="Document Summary" 
+                />
+              )}
+            </div>
 
-        <div className="mb-6">
-          {dataStatus[STORAGE_KEYS.DOCUMENT_SUMMARY] ? (
-            <DocumentSummary skipLoading={true} />
-          ) : (
-            <EmptyState 
-              title="Document Summary" 
-            />
-          )}
-        </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">Further more ...</h2>
+              <p className="text-gray-600 dark:text-gray-300">Additional visualizations and analysis tools will be added here.</p>
+            </div>
+          </main>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">Further more ...</h2>
-          <p className="text-gray-600 dark:text-gray-300">Additional visualizations and analysis tools will be added here.</p>
+          <footer className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
+            <div className="flex items-center justify-center gap-2">
+              <Logo darkMode={theme === 'dark'} size="small" />
+              <p>© {new Date().getFullYear()} ClioX</p>
+            </div>
+          </footer>
         </div>
-      </main>
-
-      <footer className="mt-12 text-center text-gray-500 dark:text-gray-400 text-sm">
-        <div className="flex items-center justify-center gap-2">
-          <Logo darkMode={theme === 'dark'} size="small" />
-          <p>© {new Date().getFullYear()} ClioX</p>
-        </div>
-      </footer>
+      </div>
       
       {/* Upload Modal - with dark mode support */}
       {showUploadModal && (

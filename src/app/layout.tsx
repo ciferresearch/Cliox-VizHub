@@ -21,8 +21,14 @@ const titilliumWeb = Titillium_Web({
 });
 
 export const metadata: Metadata = {
-  title: "Text Analysis Visualization Hub",
+  title: "ClioX - Text Analysis Visualization Hub",
   description: "Interactive visualizations of text analysis results by ClioX",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
