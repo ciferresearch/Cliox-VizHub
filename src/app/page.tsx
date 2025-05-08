@@ -5,9 +5,11 @@ import SentimentChart from '@/components/visualizations/sentiment/SentimentChart
 import DataDistribution from '@/components/visualizations/distribution/DataDistribution';
 import WordCloud from '@/components/visualizations/wordcloud';
 import DocumentSummary from '@/components/visualizations/summary/DocumentSummary';
-import UploadPage from '@/components/ui/upload/UploadPage';
-import Logo from '@/components/layout/Logo';
 import Header from '@/components/layout/Header';
+import VisualizationWrapper from '@/components/ui/common/VisualizationWrapper';
+import LoadingIndicator from '@/components/ui/common/LoadingIndicator';
+import FutureFeatures from '@/components/ui/common/FutureFeatures';
+import UploadModal from '@/components/ui/upload/UploadModal';
 import { STORAGE_KEYS, useDataStore } from '@/store/dataStore';
 import { useTheme } from '@/store/themeStore';
 
@@ -65,27 +67,8 @@ export default function Home() {
   
   // Show loading state
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-700 dark:text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingIndicator />;
   }
-  
-  // Empty state component for visualization placeholders
-  const EmptyState = ({ title }: { title: string }) => (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 flex flex-col items-center justify-center min-h-[300px] text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-      <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-300 mb-1">No data available to display.</p>
-      <p className="text-gray-500 dark:text-gray-400 text-sm">Click the &quot;Upload Data&quot; button in the header to get started.</p>
-    </div>
-  );
   
   // Render the dashboard with visualizations or empty states
   return (
@@ -96,93 +79,64 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <main>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {dataStatus[STORAGE_KEYS.EMAIL_DISTRIBUTION] ? (
+              <VisualizationWrapper 
+                isAvailable={dataStatus[STORAGE_KEYS.EMAIL_DISTRIBUTION]} 
+                title="Email Distribution" 
+                className=""
+              >
                 <DataDistribution
                   title="Data Distribution on Email Counts"
                   description="Shows the distribution of email counts over time"
                   type="email"
                   skipLoading={true}
-                  // disableHover={true}
                 />
-              ) : (
-                <EmptyState 
-                  title="Email Distribution" 
-                />
-              )}
+              </VisualizationWrapper>
               
-              {dataStatus[STORAGE_KEYS.DATE_DISTRIBUTION] ? (
+              <VisualizationWrapper 
+                isAvailable={dataStatus[STORAGE_KEYS.DATE_DISTRIBUTION]} 
+                title="Date Distribution"
+                className=""
+              >
                 <DataDistribution
                   title="Data Distribution on Date"
                   description="Shows the distribution of emails by date"
                   type="date"
                   skipLoading={true}
-                  // disableHover={true}
                 />
-              ) : (
-                <EmptyState 
-                  title="Date Distribution" 
-                />
-              )}
+              </VisualizationWrapper>
             </div>
 
-            <div className="mb-6">
-              {dataStatus[STORAGE_KEYS.SENTIMENT] ? (
-                <SentimentChart skipLoading={true} />
-              ) : (
-                <EmptyState 
-                  title="Sentiment Analysis" 
-                />
-              )}
-            </div>
+            <VisualizationWrapper 
+              isAvailable={dataStatus[STORAGE_KEYS.SENTIMENT]} 
+              title="Sentiment Analysis"
+            >
+              <SentimentChart skipLoading={true} />
+            </VisualizationWrapper>
 
-            <div className="mb-6">
-              {dataStatus[STORAGE_KEYS.WORD_CLOUD] ? (
-                <WordCloud />
-              ) : (
-                <EmptyState 
-                  title="Word Cloud" 
-                />
-              )}
-            </div>
+            <VisualizationWrapper 
+              isAvailable={dataStatus[STORAGE_KEYS.WORD_CLOUD]} 
+              title="Word Cloud"
+            >
+              <WordCloud />
+            </VisualizationWrapper>
 
-            <div className="mb-6">
-              {dataStatus[STORAGE_KEYS.DOCUMENT_SUMMARY] ? (
-                <DocumentSummary skipLoading={true} />
-              ) : (
-                <EmptyState 
-                  title="Document Summary" 
-                />
-              )}
-            </div>
+            <VisualizationWrapper 
+              isAvailable={dataStatus[STORAGE_KEYS.DOCUMENT_SUMMARY]} 
+              title="Document Summary"
+            >
+              <DocumentSummary skipLoading={true} />
+            </VisualizationWrapper>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">Further more ...</h2>
-              <p className="text-gray-600 dark:text-gray-300">Additional visualizations and analysis tools will be added here.</p>
-            </div>
+            <FutureFeatures />
           </main>
         </div>
       </div>
       
-      {/* Upload Modal - with dark mode support */}
-      {showUploadModal && (
-        <div className="fixed inset-0 bg-opacity-20 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-8 py-3 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
-              <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">Upload Visualization Data</h3>
-              <button 
-                onClick={() => setShowUploadModal(false)}
-                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-xl transition-colors cursor-pointer"
-                aria-label="Close modal"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-6">
-              <UploadPage onUploadSuccess={handleUploadSuccess} />
-            </div>
-          </div>
-        </div>
-      )}
+      <UploadModal 
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </div>
   );
 }
