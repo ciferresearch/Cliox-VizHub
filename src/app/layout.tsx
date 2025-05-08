@@ -26,9 +26,10 @@ export const metadata: Metadata = {
   description: "Interactive visualizations of text analysis results by ClioX",
   icons: {
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/temporary_logo_ClioX_light_mode.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/temporary_logo_ClioX_dark_mode.svg", media: "(prefers-color-scheme: dark)" }
     ],
-    shortcut: "/icon.svg",
+    shortcut: "/temporary_logo_ClioX_light_mode.svg",
   },
 };
 
