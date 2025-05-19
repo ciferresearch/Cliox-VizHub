@@ -1,5 +1,6 @@
 import { ReactElement } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface LogoProps {
   darkMode?: boolean;
@@ -7,20 +8,11 @@ interface LogoProps {
 }
 
 export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): ReactElement {
-  // Map size prop to text size classes
-  const textSizeClasses = {
-    small: {
-      desktop: 'text-xl',
-      mobile: 'text-lg'
-    },
-    medium: {
-      desktop: 'text-2xl',
-      mobile: 'text-xl'
-    },
-    large: {
-      desktop: 'text-4xl',
-      mobile: 'text-3xl'
-    }
+  // Map size prop to logo dimensions with smaller sizes for vertical logo
+  const dimensions = {
+    small: { width: 0, height: 30 },
+    medium: { width: 0, height: 36 },
+    large: { width: 0, height: 44 }
   };
 
   const unselectable = 'select-none cursor-pointer';
@@ -28,23 +20,29 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
   return (
     <Link href="/" className="relative">
       {/* Desktop and tablet logo */}
-      <div 
-        className={`hidden sm:block ${textSizeClasses[size].desktop} font-bold tracking-tight ${unselectable}`}
-        style={{ fontFamily: 'var(--font-titillium-web)' }}
-      >
-        <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>
-          Clio
-        </span>
-        <span className={darkMode ? 'text-blue-300' : 'text-blue-700'}>X</span>
+      <div className={`hidden sm:block ${unselectable}`}>
+        <Image
+          src="/cliox_vertical.svg"
+          alt="ClioX Logo"
+          width={dimensions[size].width}
+          height={dimensions[size].height}
+          style={{ width: 'auto', height: `${dimensions[size].height}px` }}
+          className="max-w-full"
+          priority
+        />
       </div>
       
       {/* Mobile logo */}
-      <div 
-        className={`block sm:hidden ${textSizeClasses[size].mobile} font-bold ${unselectable}`}
-        style={{ fontFamily: 'var(--font-titillium-web)' }}
-      >
-        <span className={darkMode ? 'text-blue-100' : 'text-blue-900'}>Clio</span>
-        <span className={darkMode ? 'text-blue-300' : 'text-blue-700'}>X</span>
+      <div className={`block sm:hidden ${unselectable}`}>
+        <Image
+          src="/cliox_vertical.svg"
+          alt="ClioX Logo"
+          width={dimensions.small.width}
+          height={dimensions.small.height}
+          style={{ width: 'auto', height: `${dimensions.small.height}px` }}
+          className="max-w-full"
+          priority
+        />
       </div>
     </Link>
   );
