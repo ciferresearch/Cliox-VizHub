@@ -15,11 +15,17 @@ export default function Footer() {
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-sm">
           <div className="flex items-center">
             <Image 
-              src="/cliox_horizontal.svg" 
+              src="/cliox.svg" 
               alt="ClioX Logo" 
               width={0}
               height={20} 
-              style={{ width: 'auto', height: '20px' }}
+              style={{ 
+                width: 'auto', 
+                height: '20px',
+                filter: isDark 
+                  ? 'grayscale(100%) brightness(0) invert(70%)' 
+                  : 'grayscale(100%) brightness(0) invert(55%)'
+              }}
               className="max-w-full"
             />
             <p className="text-sm text-gray-500 dark:text-gray-400 ml-2">© {new Date().getFullYear()} ClioX</p>

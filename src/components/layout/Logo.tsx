@@ -17,6 +17,19 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
 
   const unselectable = 'select-none cursor-pointer';
 
+  // Apply a filter in dark mode to make the logo more visible
+  const imageStyle = {
+    width: 'auto', 
+    height: `${dimensions[size].height}px`,
+    filter: darkMode ? 'brightness(0) invert(1)' : 'none'
+  };
+
+  const mobileImageStyle = {
+    width: 'auto', 
+    height: `${dimensions.small.height}px`,
+    filter: darkMode ? 'brightness(0) invert(1)' : 'none'
+  };
+
   return (
     <Link href="/" className="relative">
       {/* Desktop and tablet logo */}
@@ -26,7 +39,7 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
           alt="ClioX Logo"
           width={dimensions[size].width}
           height={dimensions[size].height}
-          style={{ width: 'auto', height: `${dimensions[size].height}px` }}
+          style={imageStyle}
           className="max-w-full"
           priority
         />
@@ -39,7 +52,7 @@ export default function Logo({ darkMode = false, size = 'medium' }: LogoProps): 
           alt="ClioX Logo"
           width={dimensions.small.width}
           height={dimensions.small.height}
-          style={{ width: 'auto', height: `${dimensions.small.height}px` }}
+          style={mobileImageStyle}
           className="max-w-full"
           priority
         />

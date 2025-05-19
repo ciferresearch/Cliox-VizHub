@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/cliox.svg", media: "(prefers-color-scheme: light)" },
-      { url: "/cliox.svg", media: "(prefers-color-scheme: dark)" }
+      { url: "/cliox_dark_mode.svg", media: "(prefers-color-scheme: dark)" }
     ],
     shortcut: "/cliox.svg",
   },
